@@ -182,6 +182,24 @@ export type PlannerHistoryItem = {
   };
 };
 
+export type BestRecommendation = {
+  id: string;
+  createdAt: string;
+  confidence: number;
+  personality: string | null;
+  interests: string;
+  days: number;
+  transport: TransportMode;
+  budgetLevel: number;
+  userName: string;
+  accommodation: {
+    name: string;
+    area: string | null;
+  };
+  topPlaces: string[];
+  estimatedTotalCost: number | null;
+};
+
 let inMemoryAccessToken: string | null = null;
 let refreshInFlight: Promise<string | null> | null = null;
 
@@ -399,6 +417,16 @@ export async function fetchCurrentUser(): Promise<AuthUser> {
 
 export async function fetchSubscriptionPlans(): Promise<SubscriptionPlan[]> {
   return requestJson<SubscriptionPlan[]>("/api/subscription/plans", {}, { requiresAuth: false });
+}
+
+export async function fetchBestRecommendation(): Promise<BestRecommendation | null> {
+  const response = await requestJson<{ recommendation: BestRecommendation | null }>(
+    "/api/recommendations/best",
+    {},
+    { requiresAuth: false, allowRefresh: false }
+  );
+
+  return response.recommendation;
 }
 
 export async function updateSubscriptionPlan(planCode: SubscriptionCode): Promise<AuthSession> {
