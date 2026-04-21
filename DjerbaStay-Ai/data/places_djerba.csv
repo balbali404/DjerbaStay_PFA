@@ -1,0 +1,66 @@
+id,name,type,category,latitude,longitude,rating,duration,price,tags,travel_type
+1,El Ghriba Synagogue,place,history,33.8115,10.8578,4.7,1.5,5,history religion synagogue pilgrimage jewish heritage ancient,culture solo
+2,Houmt Souk Market,market,culture,33.8752,10.8575,4.5,2.0,0,market souk shopping crafts spices artisan bargain local,culture family foodie budget
+3,Borj El Kebir (Ghazi Mustapha Fort),place,history,33.8810,10.8585,4.4,1.0,4,fort castle history ottoman panoramic heritage ancient,culture adventure
+4,Guellala Museum,museum,culture,33.7078,10.7458,4.3,1.5,6,museum pottery tradition heritage artisan craft berber,culture family
+5,Djerba Explore Park,park,family,33.8268,10.8625,4.5,3.0,22,crocodile farm museum heritage kids carousel aquatic theme rides,family adventure
+6,Plage Sidi Mahrez,beach,beach,33.8715,10.9245,4.6,3.0,0,beach sand sea swimming sun turquoise lagoon romantic scenic,beach romantic family
+7,Djerbahood - Erriadh Village Street Art,place,culture,33.8120,10.8590,4.8,1.5,0,street art mural village culture heritage berber architecture walk,culture adventure solo
+8,Meninx Archaeological Ruins,place,history,33.7335,10.7855,4.1,1.0,3,roman ruins archaeology ancient history heritage excavation,culture adventure
+9,Plage Seguia,beach,beach,33.8580,10.9050,4.3,2.5,0,beach calm family shallow water sand sun relax,beach family budget
+10,Lella Hadhria Museum,museum,culture,33.8268,10.8630,4.4,1.5,8,art islamic museum collection heritage exhibition culture,culture luxury
+11,Fadhloun Mosque,place,history,33.8055,10.8492,4.2,0.5,0,mosque architecture islamic white heritage culture peaceful,culture solo
+12,Hara Sghira Jewish Quarter,place,history,33.8110,10.8565,4.0,1.0,0,jewish quarter traditional village culture heritage history berber,culture solo budget
+13,Ras Rmel Flamingo Beach,beach,adventure,33.9075,10.8422,4.5,3.0,15,flamingo lagoon island boat sand shore coastal wildlife scenic,adventure beach romantic
+14,Tezdaine Palm Grove,park,nature,33.7850,10.8280,4.0,1.5,0,palm trees oasis walk nature picnic tranquil countryside,family budget adventure
+15,Plage La Lagune,beach,beach,33.8780,10.9380,4.4,2.5,0,beach lagoon calm snorkel water turquoise crystal shallow scenic,beach romantic luxury
+16,Midoun Market,market,culture,33.8070,10.9025,4.3,1.5,0,market local crafts pottery bargain artisan spices culture,culture foodie budget family
+17,Guellala Pottery Village,place,culture,33.7080,10.7455,4.2,1.0,0,pottery artisan tradition village craft heritage berber budget,culture budget
+18,El May Olive Groves,park,nature,33.8220,10.8185,3.9,1.0,0,olive trees nature walk agriculture landscape picnic budget countryside,adventure budget
+19,Sidi Jmour Lighthouse & Cape,place,adventure,33.7425,10.6880,4.2,1.5,0,lighthouse sea cliff sunset scenic view panoramic coastal romantic,adventure romantic
+20,Ras Taguermes Beach,beach,beach,33.9120,10.8890,4.3,2.5,0,beach sand sea swimming sun shallow calm family lagoon tidal,beach family budget
+21,Ajim Village & Ferry Port,place,culture,33.7295,10.7125,4.1,1.0,0,ferry port village fishing boats local life authentic south Djerba sea,culture budget adventure
+22,Sedouikech Traditional Village,place,culture,33.7680,10.7995,4.2,1.0,0,berber village traditional architecture white houses quiet authentic heritage craft,culture solo budget
+23,El Kantara Causeway,place,history,33.7885,10.7685,4.0,1.5,0,causeway roman road history sea view scenic coastal salt flat bridge mainland,culture adventure history
+24,Borj Kastil Fort,place,history,33.7910,10.7715,3.9,1.0,3,roman ruins ancient history fort archaeology excavation heritage coastal,culture adventure
+25,Plage Aghir,beach,beach,33.8285,10.8925,4.3,2.0,0,beach sand sea swimming quiet calm family lagoon south turquoise,beach family budget
+26,Houmt Souk Old Quarter Walking Tour,place,culture,33.8755,10.8570,4.6,2.0,0,old town walk architecture mosque fondouk shopping local culture historic medina,culture solo budget family
+27,Plage de Sidi Garous,beach,beach,33.8690,10.9310,4.2,2.0,0,beach resort zone touristique sand calm water swimming sunbathing,beach family luxury
+28,Sidi Mahres Cape & Lighthouse,place,adventure,33.8830,10.9520,4.3,2.0,0,cape lighthouse coastal walk scenic panoramic sea cliff north romantic,adventure romantic solo
+29,Mosque of the Strangers (Houmt Souk),place,history,33.8758,10.8568,4.5,0.5,0,ottoman mosque architecture islamic peaceful white heritage culture blue,culture solo history
+30,Fondouk (Caravanserai) Houmt Souk,place,history,33.8760,10.8565,4.4,1.0,0,caravanserai ancient hotel merchants trade route architecture history culture,culture solo history
+31,Guellala Cliffs & Berber Caves,place,adventure,33.7055,10.7425,4.0,1.5,0,cliffs cave underground berber rock adventure exploration nature heritage,adventure solo culture
+32,Plage El Abassi,beach,beach,33.8645,10.9175,4.1,2.0,0,beach quiet local sand sea swimming budget relax calm,beach budget family
+33,Djerba Golf Club,park,nature,33.8545,10.9085,3.8,2.0,50,golf course green landscape luxury sport resort leisure outdoor,luxury adventure
+34,Midoun Town Centre,place,culture,33.8075,10.9030,4.2,1.5,0,town centre local life market cafe square people watch culture affordable,culture family budget
+35,Plage Ras Taguermess Nord,beach,beach,33.9095,10.8855,4.4,2.5,0,beach wild dunes north lagoon tidal shallow calm kite surfing flamingo,beach adventure family
+36,Plage Sidi Fredj,beach,beach,33.8825,10.8695,4.2,2.0,0,beach sheltered calm local sand sea swimming quiet near houmt souk,beach budget family
+37,Midoun Wednesday Market,market,culture,33.8068,10.9028,4.5,2.0,0,weekly outdoor market local crafts pottery spices produce bargain berber family,culture foodie budget family
+38,Hara Kebira (Large Jewish Quarter),place,history,33.8135,10.8610,4.1,1.0,0,jewish quarter historic village heritage culture ancient community architecture walk,culture solo history
+39,Houmt Souk Fish Market & Fishing Port,market,culture,33.8795,10.8545,4.4,1.0,0,fish market harbour port boats fresh catch local authentic daily sunrise,culture foodie budget adventure
+40,Djerba Waterpark Aquatika,park,family,33.8625,10.9155,4.3,3.0,18,waterpark slides splash aquatic family kids fun summer outdoor rides,family adventure budget
+41,Borj Hsar Roman Ruins (near El Kantara),place,history,33.7895,10.7698,3.9,1.0,3,roman ruins fort archaeology ancient history coastal heritage excavation,culture adventure history
+42,Salt Flats (Sebkha) Scenic Viewpoint,park,nature,33.7965,10.7825,4.0,1.0,0,salt flats sebkha pink lake flamingo scenic nature photography landscape flat,adventure budget nature
+43,Arkou Ruins,place,history,33.7860,10.7755,3.8,1.0,0,ancient ruins archaeology roman heritage history excavation coastal south,culture adventure history
+44,Sidi Salem Mosque,place,history,33.8762,10.8572,4.3,0.5,0,mosque whitewashed architecture islamic heritage cultural peaceful old town,culture solo history
+45,Cap Rathet (Southern Tip of Djerba),place,adventure,33.6935,10.7385,4.2,2.0,0,cape southern tip scenic panoramic sea wild nature remote coastal walk,adventure solo romantic
+46,Plage de la Douce (Club Med Beach),beach,beach,33.8655,10.9195,4.3,2.0,0,beach resort zone touristique calm sea swimming luxury hotel private,beach luxury family
+47,Plage Taguermess,beach,beach,33.9085,10.8865,4.4,2.5,0,beach lagoon tidal flamingo kite surf shallow calm north scenic dunes,beach adventure family
+48,Ras Taguermess Lighthouse,place,adventure,33.9135,10.8915,4.5,1.5,0,lighthouse cape scenic panoramic north coast romantic walk sea cliffs view,adventure romantic solo
+49,Sidi Mahres Heritage Nature Walk,place,adventure,33.8775,10.9425,4.2,2.0,0,nature walk coastal trail panoramic scenic sea cliff heritage north cape,adventure romantic solo
+50,Pottery Workshop Guellala,place,culture,33.7075,10.7448,4.4,1.5,8,pottery workshop hands-on craft artisan berber tradition kiln terracotta,culture family budget
+51,Berber Jewelry & Silver Market Houmt Souk,market,culture,33.8755,10.8575,4.3,1.0,0,berber jewelry silver craft artisan souk market bargain handmade heritage,culture budget foodie family
+52,Djerba Heritage Center (near Djerba Explore),museum,culture,33.8270,10.8620,4.3,1.5,8,heritage museum local history exhibition berber jewish arabic traditional,culture family
+53,Plage Sanary (Zone Touristique South),beach,beach,33.8595,10.9125,4.1,2.0,0,beach resort south quiet calm sand sea swimming sunbathing local,beach budget family
+54,Sidi Jmour Beach,beach,beach,33.7418,10.6895,4.0,2.0,0,beach remote wild south cape cliff sea quiet nature adventure local,beach adventure budget solo
+55,Picnic at Tezdaine Oasis,park,nature,33.7855,10.8275,4.1,1.5,0,oasis picnic palm grove nature tranquil countryside family budget relax,family budget nature
+56,Quad Biking Desert Tour,tour,adventure,33.7755,10.8145,4.4,2.5,35,quad bike desert adventure dunes sand off-road tour exciting,adventure family
+57,Camel Ride Experience,tour,adventure,33.8565,10.9075,4.3,1.5,20,camel ride desert beach sunset traditional experience tour,adventure family romantic
+58,Boat Trip to Flamingo Island,tour,adventure,33.9070,10.8425,4.6,3.0,25,boat trip flamingo island lagoon wildlife scenic nature excursion,adventure family romantic beach
+59,Snorkeling & Diving Experience,tour,adventure,33.8680,10.9255,4.5,3.0,40,snorkeling diving underwater sea marine life coral reef adventure,adventure beach
+60,Traditional Fishing Trip,tour,adventure,33.8790,10.8540,4.2,4.0,30,fishing boat traditional local sea catch experience authentic,adventure foodie culture
+61,Sunset Sailing Cruise,tour,romantic,33.8720,10.9285,4.7,2.5,45,sailing cruise sunset romantic sea boat scenic evening,romantic adventure luxury
+62,Guided Houmt Souk Walking Tour,tour,culture,33.8758,10.8572,4.5,2.0,15,walking tour guide history culture souk market architecture,culture solo family
+63,Cooking Class Tunisian Cuisine,tour,culture,33.8072,10.9028,4.6,3.0,35,cooking class tunisian cuisine food local traditional hands-on,foodie culture family
+64,Spa & Thalassotherapy Day,tour,luxury,33.8635,10.9165,4.5,4.0,60,spa thalasso wellness relaxation massage luxury treatment,luxury romantic
+65,Horseback Riding Beach Tour,tour,adventure,33.8695,10.9235,4.4,2.0,30,horse riding beach tour adventure scenic coastal,adventure romantic family

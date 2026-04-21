@@ -1,0 +1,12 @@
+<svg width="960" height="720" viewBox="0 0 960 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sd1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0F766E"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="720" fill="url(#sd1)"/>
+  <rect x="140" y="210" width="680" height="300" rx="24" fill="#F8FAFC" fill-opacity="0.24"/>
+  <path d="M190 500L340 360L470 450L610 320L770 500" stroke="#CCFBF1" stroke-width="10" stroke-linecap="round"/>
+  <text x="220" y="160" fill="#CCFBF1" font-family="Segoe UI, Arial" font-size="52" font-weight="700">Dar Dhiafa</text>
+</svg>

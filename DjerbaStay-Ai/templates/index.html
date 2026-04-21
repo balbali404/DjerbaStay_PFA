@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>DjerbaStay - Trip Planner</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <!-- Leaflet Map Library -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .med-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#137fec11 1px, transparent 1px), radial-gradient(#137fec11 1px, #ffffff 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        /* Base input range styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #137fec;
+            cursor: pointer;
+            border: 4px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            margin-top: -8px;
+            /* centering */
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+
+        /* Stepper buttons */
+        .stepper-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stepper-btn:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Option selection visual */
+        .option-selected {
+            border-color: #137fec !important;
+        }
+
+        .option-selected .selected-indicator {
+            opacity: 1 !important;
+        }
+
+        .option-selected-bg {
+            background-color: rgba(19, 127, 236, 0.05) !important;
+        }
+
+        /* Scrollbar for accommodation list */
+        .accomm-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* Loading skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            animation: toast-in 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast-success { background: #10b981; color: white; }
+        .toast-error { background: #ef4444; color: white; }
+        .toast-warning { background: #f59e0b; color: white; }
+
+        @keyframes toast-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Button loading state */
+        .btn-loading {
+            pointer-events: none;
+            position: relative;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Staggered fade-in animation */
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .day-card { animation-delay: calc(var(--day-index) * 0.1s); }
+
+        /* Hover scale on place cards */
+        .place-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ── Map & Animation Styles ── */
+        #tripMap {
+            height: 100%;
+            width: 100%;
+            border-radius: 0.75rem;
+            z-index: 1;
+        }
+
+        .leaflet-container {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Custom map markers */
+        .custom-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .custom-marker:hover {
+            transform: scale(1.1);
+        }
+
+        .marker-accommodation {
+            background: linear-gradient(135deg, #137fec, #0ea5e9);
+            width: 44px;
+            height: 44px;
+            border: 3px solid white;
+        }
+
+        .marker-activity {
+            background: linear-gradient(135deg, #10b981, #059669);
+            width: 36px;
+            height: 36px;
+            border: 2px solid white;
+        }
+
+        .marker-number {
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Animated route line */
+        .animated-route {
+            stroke-dasharray: 12, 8;
+            animation: dash 30s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
+        }
+
+        /* Activity card animations */
+        .activity-card {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .activity-card.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .activity-card.active {
+            border-color: #137fec;
+            background: linear-gradient(135deg, rgba(19, 127, 236, 0.05), rgba(19, 127, 236, 0.02));
+            box-shadow: 0 4px 20px rgba(19, 127, 236, 0.15);
+        }
+
+        /* Day navigation pills */
+        .day-pill {
+            transition: all 0.3s ease;
+        }
+
+        .day-pill.active {
+            background: #137fec;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .day-pill:not(.active):hover {
+            background: rgba(19, 127, 236, 0.1);
+        }
+
+        /* Pulse animation for current activity marker */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .pulse-marker::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(19, 127, 236, 0.4);
+            animation: pulse-ring 1.5s ease-out infinite;
+        }
+
+        /* Map controls styling */
+        .map-control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: white;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-control-btn:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .map-control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Progress timeline */
+        .timeline-progress {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .timeline-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #137fec, #0ea5e9);
+            transition: width 0.5s ease;
+        }
+
+        /* Budget reveal animation */
+        .budget-item {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .budget-item.visible {
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Play/Pause button */
+        .play-btn {
+            background: linear-gradient(135deg, #137fec, #0ea5e9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(19, 127, 236, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(19, 127, 236, 0.5);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+    <div class="relative flex min-h-screen w-full flex-col">
+
+        <!-- Toast Container -->
+        <div id="toastContainer" class="toast-container"></div>
+
+        <!-- Header -->
+        <header
+            class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 px-6 lg:px-20 py-4 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+            <div class="flex items-center gap-3 text-primary">
+                <div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg">
+                    <span class="material-symbols-outlined text-primary">holiday_village</span>
+                </div>
+                <h2 class="text-slate-900 dark:text-slate-100 text-xl font-extrabold leading-tight tracking-tight">
+                    DjerbaStay</h2>
+            </div>
+            <div class="flex flex-1 justify-end gap-10">
+                <div class="hidden md:flex items-center gap-8">
+                    <a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors"
+                        href="#">Explore</a>
+                    <a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors"
+                        href="#">Suggest Stays</a>
+                    <a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors"
+                        href="#">Planner</a>
+                </div>
+                <button
+                    class="flex min-w-[100px] cursor-pointer items-center justify-center rounded-full h-10 px-6 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+                    <span>Login</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-20 py-10">
+
+
+
+
+
+            <!-- ─── RESULTS PANEL (Hidden Initially) ─── -->
+            <!-- MAP VERSION 2.0 - Updated April 2026 -->
+            <div id="resultsPanel" class="hidden">
+                <!-- Top Header Bar -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="bg-primary/10 text-primary font-semibold text-sm px-3 py-1.5 rounded-full flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">psychology</span>
+                                <span>Your Travel Style: <span id="resPersonality" class="font-bold">---</span></span>
+                            </div>
+                            <div class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
+                                <span id="resConfidence" class="font-bold text-primary">---</span> match
+                            </div>
+                        </div>
+                        <h1 class="text-slate-900 text-3xl font-black">Your Djerba Adventure</h1>
+                        <p class="text-slate-500 flex items-center gap-2 mt-1">
+                            <span class="material-symbols-outlined text-sm">calendar_today</span>
+                            <span id="resDates">May 12 - May 15, 2024</span>
+                            <span class="text-slate-300">•</span>
+                            <span><span id="resTravelersCount">2</span> travelers</span>
+                            <span class="text-slate-300">•</span>
+                            <span><span id="resDaysCount">3</span> days</span>
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="restartPlanner()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-all">
+                            <span class="material-symbols-outlined text-sm">restart_alt</span>
+                            Start Over
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- Left Panel: Map -->
+                    <div class="lg:col-span-7 xl:col-span-8">
+                        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden sticky top-24">
+                            <!-- Map Container -->
+                            <div class="relative h-[500px]">
+                                <div id="tripMap" class="h-full w-full"></div>
+                                
+                                <!-- Map Overlay Controls -->
+                                <div class="absolute top-4 left-4 z-[1000] flex flex-col gap-2">
+                                    <div class="bg-white rounded-xl shadow-lg p-3">
+                                        <div class="flex items-center gap-2 text-sm font-bold text-slate-700">
+                                            <span class="material-symbols-outlined text-primary">hotel</span>
+                                            <span id="mapAccName" class="truncate max-w-[180px]">Accommodation</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Day Navigation Overlay -->
+                                <div class="absolute bottom-4 left-4 right-4 z-[1000]">
+                                    <div class="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-4">
+                                        <!-- Day Pills -->
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div id="dayPills" class="flex gap-2">
+                                                <!-- Day pills injected here -->
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <button onclick="prevDay()" id="btnPrevDay" class="map-control-btn" disabled>
+                                                    <span class="material-symbols-outlined text-slate-600">chevron_left</span>
+                                                </button>
+                                                <button onclick="toggleAutoPlay()" id="btnPlayPause" class="play-btn">
+                                                    <span class="material-symbols-outlined">play_arrow</span>
+                                                </button>
+                                                <button onclick="nextDay()" id="btnNextDay" class="map-control-btn">
+                                                    <span class="material-symbols-outlined text-slate-600">chevron_right</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Progress Bar -->
+                                        <div class="timeline-progress">
+                                            <div id="animationProgress" class="timeline-progress-bar" style="width: 0%"></div>
+                                        </div>
+                                        
+                                        <!-- Current Activity Info -->
+                                        <div id="currentActivityInfo" class="mt-3 flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                <span class="material-symbols-outlined text-primary">flag</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-slate-400">Starting from</p>
+                                                <p id="currentActivityName" class="font-bold text-slate-800">Your Accommodation</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Activities & Budget -->
+                    <div class="lg:col-span-5 xl:col-span-4 space-y-6">
+                        
+                        <!-- Day Header -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="text-xs text-primary font-bold uppercase tracking-wider">Currently Viewing</p>
+                                    <h2 id="currentDayTitle" class="text-2xl font-black text-slate-800">Day 1</h2>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-slate-400">Activities</p>
+                                    <p id="activityCounter" class="text-lg font-bold text-slate-700">0 / 0</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Activities List -->
+                            <div id="activitiesList" class="space-y-3 max-h-[300px] overflow-y-auto">
+                                <!-- Activity cards injected here -->
+                            </div>
+                        </div>
+
+                        <!-- Budget Summary Card -->
+                        <div class="bg-gradient-to-br from-primary to-blue-600 rounded-xl p-5 text-white shadow-xl">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-white/80 font-medium text-sm">Estimated Budget</span>
+                                <span class="material-symbols-outlined text-2xl">payments</span>
+                            </div>
+                            <div id="resTotalCost" class="text-4xl font-black mb-1">---</div>
+                            <p class="text-white/60 text-xs">Activities, food & transport (excl. accommodation)</p>
+                            
+                            <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/20">
+                                <div class="text-center">
+                                    <p class="text-xs text-white/60">Per Day</p>
+                                    <p id="resPerDay" class="text-lg font-bold">€---</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-xs text-white/60">Per Person</p>
+                                    <p id="resPerPerson" class="text-lg font-bold">€---</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Budget Breakdown -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-primary">analytics</span>
+                                Cost Breakdown
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="budget-item" id="budgetItemAct">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-slate-600 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-lg text-primary">attractions</span>
+                                            Activities
+                                        </span>
+                                        <span id="resCostAct" class="font-bold text-slate-800">---</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                        <div id="resPercAct" class="bg-primary h-full transition-all duration-1000" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="budget-item" id="budgetItemFood">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-slate-600 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-lg text-green-500">restaurant</span>
+                                            Food & Dining
+                                        </span>
+                                        <span id="resCostFood" class="font-bold text-slate-800">---</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                        <div id="resPercFood" class="bg-green-500 h-full transition-all duration-1000" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="budget-item" id="budgetItemTrans">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-slate-600 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-lg text-amber-500">directions_car</span>
+                                            Transport
+                                        </span>
+                                        <span id="resCostTrans" class="font-bold text-slate-800">---</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                        <div id="resPercTrans" class="bg-amber-500 h-full transition-all duration-1000" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-slate-100">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500 flex items-center gap-2">
+                                        <span class="material-symbols-outlined">commute</span>
+                                        Transport Mode
+                                    </span>
+                                    <span id="resTransport" class="font-bold text-slate-700">---</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Accommodation Card -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-primary">hotel</span>
+                                Your Home Base
+                            </h3>
+                            <div class="flex items-start gap-4">
+                                <div class="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-primary text-2xl">apartment</span>
+                                </div>
+                                <div>
+                                    <p id="resStayName" class="font-bold text-slate-800">Accommodation Name</p>
+                                    <p id="resStayMeta" class="text-sm text-slate-500">Area, Djerba</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ─── PLANNING WIZARD ─── -->
+            <div id="wizardPanel" class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <!-- Left Content: Form -->
+                <div class="lg:col-span-8 space-y-12">
+
+                    <!-- Progress Header -->
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <span id="stepIndicatorLabel"
+                                    class="text-primary font-bold text-sm uppercase tracking-widest">Step 1 of 3</span>
+                                <h2 id="stepTitle" class="text-3xl font-extrabold mt-1">Personalize Your Journey</h2>
+                            </div>
+                            <span id="progressPct" class="text-slate-400 font-medium">33% Complete</span>
+                        </div>
+                        <!-- Progress track -->
+                        <div class="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                            <div id="progressBar" class="h-full bg-primary transition-all duration-500 rounded-full"
+                                style="width: 33%"></div>
+                        </div>
+                    </div>
+
+                    <!-- ================= STEP 1: Personalize ================= -->
+                    <div id="stepData1" class="wizard-step block space-y-12">
+                        <!-- Question 1: Vibe -->
+                        <section class="space-y-6">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                                <h3 class="text-xl font-bold">What's your vibe?</h3>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <button onclick="selectVibe('luxury')" id="vibe-luxury"
+                                    class="vibe-btn group relative flex flex-col gap-3 p-2 rounded-xl border-2 border-transparent bg-white shadow-sm transition-all text-left">
+                                    <div class="aspect-square rounded-lg overflow-hidden relative">
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                                        </div>
+                                        <img class="w-full h-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxY_xXt-EY8JoxgcQv3WAgLVFBtmpYE3jf6dRLYJ-nFvaHZ55-tST5u0HtARqcWouH38Ksf2BX91kdy4R8oiDAfbxrz9GSewvcYNSnZEDxr5hQH_67dJ1-6aoJIGW6K8YmTnIRh5-8HWFV97BpP4VuRHISVZYangR2nXgWXF5MnHjMLNj-Aeb35Sk8Sb_5WlzZR0uEFx6aHhMuy6HAmLlP9IgiR8MywsIUChI9VxI53MlYSCmHUbIjEPXmrtqX_kLLQAXCsnfM4h8">
+                                    </div>
+                                    <div class="px-2 pb-2">
+                                        <p class="font-bold text-sm">Luxury</p>
+                                        <p class="text-xs text-slate-500">Premium comfort</p>
+                                    </div>
+                                    <div
+                                        class="selected-indicator absolute top-4 right-4 opacity-0 bg-primary text-white rounded-full p-1 shadow-md transition-opacity">
+                                        <span class="material-symbols-outlined text-xs">check</span>
+                                    </div>
+                                </button>
+                                <button onclick="selectVibe('authentic')" id="vibe-authentic"
+                                    class="vibe-btn option-selected option-selected-bg group relative flex flex-col gap-3 p-2 rounded-xl border-2 border-transparent bg-white shadow-sm transition-all text-left">
+                                    <div class="aspect-square rounded-lg overflow-hidden relative">
+                                        <img class="w-full h-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfWbD0TgdWinIiPyMLJ00wii8yA3ZFIUyBPlI3zJpOeOVhEgSgmd5UJC2SMnY6FU9f5XhWWUwfI1wOluqW_nreT4WKtHPRkD8phGEPNXHxVIDWGWqfLgIltO_Mi8qJh6K9mviyCBkVfhpEH6Qb-nigKXkjPx-FVSq2MfTXSr7Ns36SD_8Fhx8U3kGjZ5ayVWnU3icz-wEWYHuEAYSDFnhHBu81pZfBy0uzDBjn3BF8VGUIP4xV72CqycdGVKM_hKIv-UwM3dup4vk">
+                                    </div>
+                                    <div class="px-2 pb-2">
+                                        <p class="font-bold text-sm">Authentic &amp; Calm</p>
+                                        <p class="text-xs text-slate-500">Peaceful traditional</p>
+                                    </div>
+                                    <div
+                                        class="selected-indicator absolute top-4 right-4 bg-primary text-white rounded-full p-1 shadow-md">
+                                        <span class="material-symbols-outlined text-xs">check</span>
+                                    </div>
+                                </button>
+                                <button onclick="selectVibe('beach')" id="vibe-beach"
+                                    class="vibe-btn group relative flex flex-col gap-3 p-2 rounded-xl border-2 border-transparent bg-white shadow-sm transition-all text-left">
+                                    <div class="aspect-square rounded-lg overflow-hidden relative">
+                                        <img class="w-full h-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeeTRLtvw-8PTSiQqw_AoNsBNtdwLYf1Ov2h91u-1pCKBOciiUmcQ1eiGuFlTR8QQCbjA76Pk6dqS64fxxfzqbyJq0KdjZLondrhQ1EvnJwsSTe9k0e7fkW7P1Jj5KwzvWh0ZbQ5KaDCqB8je0lsvhciOhIV-M5kMxxc-MyZaDcCNwUCDuFeF56U3uRfnEEO6KC1PAlPnPDBCp1ATdBk5ysuANXFB-TpkkI_35ObGgi2A5i6ft_ls-fX9XBMXF7EJFAbwIABq7syQ">
+                                    </div>
+                                    <div class="px-2 pb-2">
+                                        <p class="font-bold text-sm">Beachfront</p>
+                                        <p class="text-xs text-slate-500">Steps from sand</p>
+                                    </div>
+                                    <div
+                                        class="selected-indicator absolute top-4 right-4 opacity-0 bg-primary text-white rounded-full p-1 shadow-md transition-opacity">
+                                        <span class="material-symbols-outlined text-xs">check</span>
+                                    </div>
+                                </button>
+                                <button onclick="selectVibe('local')" id="vibe-local"
+                                    class="vibe-btn group relative flex flex-col gap-3 p-2 rounded-xl border-2 border-transparent bg-white shadow-sm transition-all text-left">
+                                    <div class="aspect-square rounded-lg overflow-hidden relative">
+                                        <img class="w-full h-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXaZPsDE3_7cPX0dw-fQr7l4NYqrKq8DbHwkKylud_DCRVwuciCoIbDpqtI0pRenIHwBHnXAHK_r9wdEJi3esshtLhkA7R1m9A-ghci7a3xzr_3R7W2UDB4-Nm8VZJ9-fRpnDF0yJayUySk00eOBTuNmVdRm6bLo1mSHL6Yec15FVYqCggH_lnGg11Yq9mMFrJT6YyfUXyVO_whQ9OXEtMs5i0ECGqA1Un9oqCYhx1-eoyfCGQ8ImDGZTpCWUS9PWftm8mRSkGf5Q">
+                                    </div>
+                                    <div class="px-2 pb-2">
+                                        <p class="font-bold text-sm">Local Experience</p>
+                                        <p class="text-xs text-slate-500">Live like a local</p>
+                                    </div>
+                                    <div
+                                        class="selected-indicator absolute top-4 right-4 opacity-0 bg-primary text-white rounded-full p-1 shadow-md transition-opacity">
+                                        <span class="material-symbols-outlined text-xs">check</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Question 2: Budget -->
+                        <section class="space-y-6">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">payments</span>
+                                <h3 class="text-xl font-bold">Define your budget.</h3>
+                            </div>
+                            <div
+                                class="p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                                <div class="flex justify-between mb-8">
+                                    <div class="text-center flex-1 transition-all" id="lbl-budget-1">
+                                        <span
+                                            class="block text-xs font-bold text-slate-400 uppercase tracking-tighter lbl-name">Budget</span>
+                                        <span class="text-lg font-bold text-slate-400 lbl-val">$</span>
+                                    </div>
+                                    <div class="text-center flex-1 border-x border-slate-100 transition-all"
+                                        id="lbl-budget-2">
+                                        <span
+                                            class="block text-xs font-bold text-primary uppercase tracking-tighter lbl-name">Standard</span>
+                                        <span class="text-2xl font-black text-primary lbl-val">$$</span>
+                                    </div>
+                                    <div class="text-center flex-1 transition-all" id="lbl-budget-3">
+                                        <span
+                                            class="block text-xs font-bold text-slate-400 uppercase tracking-tighter lbl-name">Premium</span>
+                                        <span class="text-lg font-bold text-slate-400 lbl-val">$$$</span>
+                                    </div>
+                                </div>
+                                <input id="budgetRange"
+                                    class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                                    max="3" min="1" type="range" value="2" oninput="updateBudgetLabels(this.value)" />
+                                <p class="text-center mt-6 text-sm text-slate-500 italic">"We'll prioritize the best
+                                    value experiences within your range."</p>
+                            </div>
+                        </section>
+
+                        <!-- Base Camp / Accommodation Search -->
+                        <section class="space-y-6">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">location_on</span>
+                                <h3 class="text-xl font-bold">Choose your home base</h3>
+                            </div>
+                            <p class="text-sm text-slate-500">Search to select your booked accommodation, or choose from
+                                our list.</p>
+
+                            <div class="relative">
+                                <span
+                                    class="material-symbols-outlined absolute left-4 top-3 text-slate-400">search</span>
+                                <input type="text" id="accSearch" onkeyup="filterAcc(this.value)"
+                                    placeholder="Search hotels, houses..."
+                                    class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary shadow-sm outline-none transition-all">
+                            </div>
+
+                            <div id="accList"
+                                class="bg-white rounded-xl border border-slate-200 shadow-sm p-2 flex flex-col gap-1 accomm-list max-h-[300px] overflow-y-auto">
+                                <!-- Accommodations injected here -->
+                            </div>
+
+                            <div id="accSelected"
+                                class="hidden bg-primary/5 border border-primary rounded-xl p-4 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                                        <span class="material-symbols-outlined" id="accIcon">hotel</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-sm text-slate-800" id="accName">Selected Hotel</div>
+                                        <div class="text-xs text-slate-500" id="accMeta">Houmt Souk</div>
+                                    </div>
+                                </div>
+                                <button onclick="clearAcc()"
+                                    class="text-red-500 hover:text-red-700 text-sm font-bold p-2">Clear</button>
+                            </div>
+                        </section>
+
+
+
+
+
+
+
+                        <div class="pt-6 border-t border-slate-100 flex justify-end">
+                            <button onclick="navigateWizard(2)"
+                                class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all">
+                                Next Step <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ================= STEP 2: Travelers ================= -->
+                    <div id="stepData2" class="wizard-step hidden space-y-12">
+                        <!-- Group Type -->
+                        <section class="space-y-6">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">group</span>
+                                <h3 class="text-xl font-bold">Who are you travelling with?</h3>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <button onclick="selectGroup('family')" id="group-family"
+                                    class="group-btn option-selected option-selected-bg group flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-transparent bg-white transition-all shadow-sm">
+                                    <span class="text-3xl">👨‍👩‍👧‍👦</span>
+                                    <span class="font-bold text-sm">Family</span>
+                                </button>
+                                <button onclick="selectGroup('romantic')" id="group-romantic"
+                                    class="group-btn group flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-slate-100 bg-white transition-all shadow-sm">
+                                    <span class="text-3xl">💑</span>
+                                    <span class="font-bold text-sm">Romantic</span>
+                                </button>
+                                <button onclick="selectGroup('solo')" id="group-solo"
+                                    class="group-btn group flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-slate-100 bg-white transition-all shadow-sm">
+                                    <span class="text-3xl">🧘</span>
+                                    <span class="font-bold text-sm">Solo</span>
+                                </button>
+                                <button onclick="selectGroup('friends')" id="group-friends"
+                                    class="group-btn group flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-slate-100 bg-white transition-all shadow-sm">
+                                    <span class="text-3xl">🎉</span>
+                                    <span class="font-bold text-sm">Friends</span>
+                                </button>
+                                <button onclick="selectGroup('adventure')" id="group-adventure"
+                                    class="group-btn group flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-slate-100 bg-white transition-all shadow-sm">
+                                    <span class="text-3xl">🏕️</span>
+                                    <span class="font-bold text-sm">Adventure</span>
+                                </button>
+                                <button onclick="selectGroup('business')" id="group-business"
+                                    class="group-btn group flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-slate-100 bg-white transition-all shadow-sm">
+                                    <span class="text-3xl">💼</span>
+                                    <span class="font-bold text-sm">Business</span>
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Travelers -->
+                        <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                                <div
+                                    class="flex items-center gap-2 text-slate-500 font-bold text-sm uppercase tracking-widest">
+                                    <span class="material-symbols-outlined text-lg">person</span> Travellers
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <button onclick="adjustPersons(-1)" class="stepper-btn">−</button>
+                                    <div class="text-3xl font-black text-slate-800" id="numPersons">2</div>
+                                    <button onclick="adjustPersons(1)" class="stepper-btn">+</button>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                                <div
+                                    class="flex items-center gap-2 text-slate-500 font-bold text-sm uppercase tracking-widest">
+                                    <span class="material-symbols-outlined text-lg">calendar_month</span> Duration
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <button onclick="adjustDays(-1)" class="stepper-btn">−</button>
+                                    <div class="text-3xl font-black text-slate-800" id="numDays">3</div>
+                                    <button onclick="adjustDays(1)" class="stepper-btn">+</button>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                                <div
+                                    class="flex items-center gap-2 text-slate-500 font-bold text-sm uppercase tracking-widest">
+                                    <span class="material-symbols-outlined text-lg">event</span> Start Date
+                                </div>
+                                <input type="date" id="startDatePicker" onchange="updateStartDate(this.value)"
+                                    class="w-full py-2 px-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary shadow-sm outline-none transition-all text-slate-800 font-bold text-center text-lg" />
+                            </div>
+                        </section>
+                        <!-- Date range preview -->
+                        <div id="dateRangePreview"
+                            class="flex items-center gap-2 text-sm font-semibold text-primary bg-primary/5 border border-primary/20 rounded-xl px-4 py-3">
+                            <span class="material-symbols-outlined text-sm">date_range</span>
+                            <span id="dateRangeText">Select a start date above</span>
+                        </div>
+
+                        <div class="pt-6 border-t border-slate-100 flex justify-between items-center">
+                            <button onclick="navigateWizard(1)"
+                                class="text-slate-500 hover:text-slate-800 font-bold flex items-center gap-2 transition-colors">
+                                <span class="material-symbols-outlined text-sm">arrow_back</span> Back
+                            </button>
+                            <button onclick="navigateWizard(3)"
+                                class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all">
+                                Next Step <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ================= STEP 3: Logistics ================= -->
+                    <div id="stepData3" class="wizard-step hidden space-y-12">
+                        <!-- Transport -->
+                        <section class="space-y-6">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">directions_car</span>
+                                <h3 class="text-xl font-bold">How will you get around?</h3>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <button onclick="selectTransport('taxi')" id="trans-taxi"
+                                    class="trans-btn option-selected option-selected-bg group flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-white transition-all text-left shadow-sm">
+                                    <span class="text-2xl">🚖</span>
+                                    <div>
+                                        <div class="font-bold text-sm">Taxi</div>
+                                        <div class="text-xs text-slate-500">Door-to-door comfort</div>
+                                    </div>
+                                </button>
+                                <button onclick="selectTransport('car_rental')" id="trans-car_rental"
+                                    class="trans-btn group flex items-center gap-4 p-4 rounded-xl border-2 border-slate-100 bg-white transition-all text-left shadow-sm">
+                                    <span class="text-2xl">🚗</span>
+                                    <div>
+                                        <div class="font-bold text-sm">Car Rental</div>
+                                        <div class="text-xs text-slate-500">Full freedom</div>
+                                    </div>
+                                </button>
+                                <button onclick="selectTransport('bus')" id="trans-bus"
+                                    class="trans-btn group flex items-center gap-4 p-4 rounded-xl border-2 border-slate-100 bg-white transition-all text-left shadow-sm">
+                                    <span class="text-2xl">🚌</span>
+                                    <div>
+                                        <div class="font-bold text-sm">Local Bus</div>
+                                        <div class="text-xs text-slate-500">Budget friendly</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </section>
+
+
+
+                        <div class="pt-6 border-t border-slate-100 flex justify-between items-center">
+                            <button onclick="navigateWizard(2)"
+                                class="text-slate-500 hover:text-slate-800 font-bold flex items-center gap-2 transition-colors">
+                                <span class="material-symbols-outlined text-sm">arrow_back</span> Back
+                            </button>
+                            <div class="text-sm text-slate-400 flex items-center gap-2"><span
+                                    class="material-symbols-outlined">check_circle</span> Ready to generate</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Sidebar: Info & CTA -->
+                <div class="lg:col-span-4 space-y-8">
+                    <div class="sticky top-32 space-y-8">
+                        <!-- AI Info Box -->
+                        <div
+                            class="med-pattern p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-2 mb-4 text-primary">
+                                    <span class="material-symbols-outlined">psychology</span>
+                                    <span class="font-bold text-sm uppercase tracking-wider">Why this matters</span>
+                                </div>
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    Our ML engine analyzes thousands of real-time bookings in Djerba to provide a
+                                    hyper-personalized itinerary.
+                                </p>
+                                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-bold text-slate-500">Estimated Daily Cost</span>
+                                        <span class="text-lg font-bold text-primary" id="estimatedCostDisplay">$60 -
+                                            $120</span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-widest">Based on your
+                                        current selections</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CTA Button -->
+                        <div class="space-y-4">
+                            <button id="generateBtn" onclick="generateStay()" disabled
+                                class="w-full group relative flex items-center justify-center gap-3 py-6 px-8 bg-slate-300 cursor-not-allowed text-white rounded-2xl font-bold text-lg shadow-xl transition-all">
+                                <span class="material-symbols-outlined">bolt</span>
+                                Generate My Stay
+                                <div
+                                    class="absolute -top-3 -right-3 bg-white text-slate-400 text-[10px] px-2 py-1 rounded-full font-black uppercase tracking-tighter border border-slate-200 shadow-sm">
+                                    Powered by ML
+                                </div>
+                            </button>
+                            <p class="text-center text-xs text-slate-400" id="generateSubtext">
+                                Complete all 3 steps to unlock generation.
+                            </p>
+                        </div>
+
+                        <!-- Map Preview/Hint -->
+                        <div
+                            class="rounded-2xl overflow-hidden grayscale opacity-50 contrast-125 border border-slate-200 h-48 relative">
+                            <img class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYzc65rV_GVIM8dI35vbxu7FtoVWnxbZqZMKIX2oDQPQnXmOBQOzQ4DlvG7yvp1fvOmwlvZcPMLtBhReiFvJ85N_0gXBHaVOWWgHIYoloZmSJ6wuEgHGCbnNC8ePe8QSmvycntCYNMQidO-pXwmw6KYD2oe2QUo3GD1u_N8jHqWEK8ZLJlHzKJCSifgD1V8fxn1FSYfMs12mk6eHL3c-4mmdWJlArze7LgUjrQLEdgTo3Y2xxaakNwxytGm5H-SBZAAv8rDgq13Lk">
+                            <div class="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                                <div class="bg-white/90 px-4 py-2 rounded-full flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-sm">location_on</span>
+                                    <span class="text-xs font-bold uppercase tracking-widest">Djerba, Tunisia</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer
+            class="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900 px-6 lg:px-20 py-12 mt-10 w-full max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 text-primary">
+                        <span class="material-symbols-outlined text-2xl">holiday_village</span>
+                        <h2 class="text-slate-900 dark:text-slate-100 text-xl font-extrabold">DjerbaStay</h2>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                        Your intelligent companion for exploring the magical island of Djerba, Tunisia.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6">Quick Links</h4>
+                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a class="hover:text-primary transition-colors" href="#">Discover Hotels</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Traditional Houses</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Island Planner</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Travel Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6">Support</h4>
+                    <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Safety Info</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Partner Program</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6">Connect</h4>
+                    <div class="flex gap-4">
+                        <a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition-all"
+                            href="#">
+                            <span class="material-symbols-outlined text-sm">public</span>
+                        </a>
+                        <a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition-all"
+                            href="#">
+                            <span class="material-symbols-outlined text-sm">camera_alt</span>
+                        </a>
+                        <a class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition-all"
+                            href="#">
+                            <span class="material-symbols-outlined text-sm">alternate_email</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="mt-20 pt-8 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium">
+                <p>© 2024 DjerbaStay. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        /* ========================================================================
+           DjerbaStay Trip Planner - Frontend JavaScript
+           ======================================================================== */
+
+        /* ── Application State ── */
+        var state = {
+            step: 1,
+            vibe: 'authentic',
+            budgetLevel: 2,
+            groupType: 'family',
+            persons: 2,
+            days: 3,
+            startDate: null,
+            transport: 'taxi',
+            accId: null,
+            accName: null,
+            accLat: null,
+            accLon: null,
+            accArea: null
+        };
+
+        /* ── Configuration ── */
+        var DATE_FORMAT = { month: 'short', day: 'numeric', year: 'numeric' };
+        var allAccommodations = [];
+        var budgetMap = { 1: 'budget', 2: 'standard', 3: 'premium' };
+        var costMap = { 1: '€40 - €70', 2: '€80 - €140', 3: '€150 - €400+' };
+        var transportLabels = { taxi: 'Taxi', car_rental: 'Car Rental', bus: 'Local Bus' };
+
+        /* ── Date Picker Functions ── */
+
+        function _initDatePicker() {
+            var picker = document.getElementById('startDatePicker');
+            var today = new Date();
+            picker.min = today.toISOString().split('T')[0];
+            var tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            picker.value = tomorrow.toISOString().split('T')[0];
+            state.startDate = tomorrow;
+            _refreshDateRange();
+        }
+
+        function updateStartDate(val) {
+            state.startDate = val ? new Date(val + 'T00:00:00') : null;
+            _refreshDateRange();
+        }
+
+        function _refreshDateRange() {
+            var el = document.getElementById('dateRangeText');
+            if (!state.startDate) { el.textContent = 'Select a start date above'; return; }
+            var end = new Date(state.startDate);
+            end.setDate(end.getDate() + state.days);
+            el.textContent = state.startDate.toLocaleDateString('en-US', DATE_FORMAT) + '  →  ' + end.toLocaleDateString('en-US', DATE_FORMAT) + '  (' + state.days + ' days)';
+        }
+
+        /* ── Wizard Navigation ── */
+
+        function navigateWizard(targetStep) {
+            document.getElementById('stepData' + state.step).classList.add('hidden');
+            document.getElementById('stepData' + state.step).classList.remove('block');
+
+            state.step = targetStep;
+
+            document.getElementById('stepData' + state.step).classList.remove('hidden');
+            document.getElementById('stepData' + state.step).classList.add('block');
+
+            var pct = targetStep === 1 ? '33%' : (targetStep === 2 ? '66%' : '100%');
+            document.getElementById('progressPct').textContent = pct + ' Complete';
+            document.getElementById('progressBar').style.width = pct;
+            document.getElementById('stepIndicatorLabel').textContent = 'Step ' + targetStep + ' of 3';
+
+            var titles = {
+                1: 'Personalize Your Journey',
+                2: 'Who is Traveling?',
+                3: 'Logistics & Details'
+            };
+            document.getElementById('stepTitle').textContent = titles[targetStep];
+
+            var genBtn = document.getElementById('generateBtn');
+            var genSub = document.getElementById('generateSubtext');
+            if (targetStep === 3) {
+                genBtn.disabled = false;
+                genBtn.classList.remove('bg-slate-300', 'cursor-not-allowed');
+                genBtn.classList.add('bg-primary', 'hover:bg-primary/90', 'shadow-primary/30', 'active:scale-[0.98]');
+                genSub.textContent = 'Click to generate a tailored ' + state.days + '-day itinerary.';
+            } else {
+                genBtn.disabled = true;
+                genBtn.classList.add('bg-slate-300', 'cursor-not-allowed');
+                genBtn.classList.remove('bg-primary', 'hover:bg-primary/90', 'shadow-primary/30', 'active:scale-[0.98]');
+                genSub.textContent = 'Complete all 3 steps to unlock generation.';
+            }
+        }
+
+        /* ── Selection Helpers ── */
+
+        function _clearSelection(className) {
+            var elements = document.querySelectorAll('.' + className);
+            for (var i = 0; i < elements.length; i++) {
+                var el = elements[i];
+                el.classList.remove('option-selected', 'border-primary', 'bg-primary/5', 'option-selected-bg');
+                el.classList.add('border-slate-100', 'border-transparent');
+                if (el.querySelector('.selected-indicator')) {
+                    el.querySelector('.selected-indicator').style.opacity = '0';
+                }
+            }
+        }
+
+        function _setSelection(id, isCard) {
+            var el = document.getElementById(id);
+            el.classList.add('option-selected');
+            if (isCard) {
+                el.classList.remove('border-transparent');
+                el.classList.add('option-selected-bg');
+                if (el.querySelector('.selected-indicator')) {
+                    el.querySelector('.selected-indicator').style.opacity = '1';
+                }
+            } else {
+                el.classList.add('border-primary', 'bg-primary/5');
+                el.classList.remove('border-slate-100');
+            }
+        }
+
+        /* ── User Preference Selectors ── */
+
+        function selectVibe(v) {
+            state.vibe = v;
+            _clearSelection('vibe-btn');
+            _setSelection('vibe-' + v, true);
+        }
+
+        function updateBudgetLabels(val) {
+            state.budgetLevel = parseInt(val);
+            document.getElementById('estimatedCostDisplay').textContent = costMap[state.budgetLevel];
+            for (var i = 1; i <= 3; i++) {
+                var lbl = document.getElementById('lbl-budget-' + i);
+                if (i === state.budgetLevel) {
+                    lbl.querySelector('.lbl-name').classList.add('text-primary');
+                    lbl.querySelector('.lbl-name').classList.remove('text-slate-400');
+                    lbl.querySelector('.lbl-val').classList.add('text-primary', 'text-2xl', 'font-black');
+                    lbl.querySelector('.lbl-val').classList.remove('text-slate-400', 'text-lg');
+                } else {
+                    lbl.querySelector('.lbl-name').classList.remove('text-primary');
+                    lbl.querySelector('.lbl-name').classList.add('text-slate-400');
+                    lbl.querySelector('.lbl-val').classList.remove('text-primary', 'text-2xl', 'font-black');
+                    lbl.querySelector('.lbl-val').classList.add('text-slate-400', 'text-lg');
+                }
+            }
+        }
+
+        function selectGroup(gt) {
+            state.groupType = gt;
+            _clearSelection('group-btn');
+            _setSelection('group-' + gt, true);
+        }
+
+        function selectTransport(tr) {
+            state.transport = tr;
+            _clearSelection('trans-btn');
+            _setSelection('trans-' + tr, true);
+        }
+
+        function adjustPersons(delta) {
+            var num = Math.max(1, Math.min(10, state.persons + delta));
+            state.persons = num;
+            document.getElementById('numPersons').textContent = num;
+        }
+
+        function adjustDays(delta) {
+            var num = Math.max(1, Math.min(7, state.days + delta));
+            state.days = num;
+            document.getElementById('numDays').textContent = num;
+            document.getElementById('generateSubtext').textContent = 'Click to generate a tailored ' + num + '-day itinerary.';
+            _refreshDateRange();
+        }
+
+        /* ── Accommodation Functions ── */
+
+        function loadAccommodations() {
+            fetch('/accommodations')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    allAccommodations = data;
+                    renderAcc(data);
+                })
+                .catch(function() { showToast('Failed to load accommodations', 'error'); });
+        }
+
+        function renderAcc(list) {
+            var container = document.getElementById('accList');
+            if (!container) return;
+            if (list.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-500 px-3 py-4">No matches found.</p>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var a = list[i];
+                var icon = 'hotel';
+                var area = a.area || 'Djerba';
+                var name = a.name || '';
+                html += '<div onclick="pickAcc(' + a.id + ', \'' + name.replace(/'/g, "\\'") + '\', ' + a.latitude + ', ' + a.longitude + ', \'' + icon + '\', \'' + area.replace(/'/g, "\\'") + '\')" class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-all border border-transparent hover:border-primary/20"><div class="size-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400"><span class="material-symbols-outlined">' + icon + '</span></div><div class="flex-1"><div class="font-bold text-sm text-slate-800">' + name + '</div><div class="text-xs text-slate-400">' + area + '</div></div></div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function filterAcc(query) {
+            var q = query.toLowerCase();
+            var filtered = allAccommodations.filter(function(a) {
+                return a.name.toLowerCase().includes(q) || (a.area || '').toLowerCase().includes(q);
+            });
+            renderAcc(filtered);
+        }
+
+        function pickAcc(id, name, lat, lon, icon, area) {
+            state.accId = id;
+            state.accName = name;
+            state.accLat = lat;
+            state.accLon = lon;
+            state.accArea = area;
+            document.getElementById('accList').classList.add('hidden');
+            document.getElementById('accSearch').closest('div.relative').classList.add('hidden');
+            document.getElementById('accSelected').classList.remove('hidden');
+            document.getElementById('accName').textContent = name;
+            document.getElementById('accMeta').textContent = area;
+            document.getElementById('accIcon').textContent = icon;
+            showToast('Selected: ' + name, 'success');
+        }
+
+        function clearAcc() {
+            state.accId = null; state.accName = null; state.accLat = null; state.accLon = null;
+            document.getElementById('accList').classList.remove('hidden');
+            document.getElementById('accSearch').closest('div.relative').classList.remove('hidden');
+            document.getElementById('accSelected').classList.add('hidden');
+            document.getElementById('accSearch').value = '';
+            renderAcc(allAccommodations);
+        }
+
+        /* ── Toast Notifications ── */
+
+        function showToast(message, type) {
+            type = type || 'success';
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            var icon = type === 'success' ? 'check_circle' : (type === 'error' ? 'error' : 'warning');
+            toast.innerHTML = '<span class="material-symbols-outlined">' + icon + '</span>' + message;
+            container.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 4000);
+        }
+
+        /* ── Trip Generation & API Calls ── */
+
+        function generateStay() {
+            if (!state.accName) {
+                showToast('Please select an accommodation!', 'error');
+                navigateWizard(3);
+                return;
+            }
+
+            var btn = document.querySelector('button[onclick="generateStay()"]');
+            var origBtnText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Generating...';
+
+            var payloadTrip = {
+                interests: state.vibe + ' ' + state.groupType + ' ' + budgetMap[state.budgetLevel],
+                days: state.days,
+                accommodation_name: state.accName,
+                accommodation_lat: state.accLat,
+                accommodation_lon: state.accLon
+            };
+
+            var payloadBudget = {
+                days: state.days,
+                persons: state.persons,
+                budget_level: state.budgetLevel,
+                transport: state.transport
+            };
+
+            Promise.all([
+                fetch('/plan_trip', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadTrip) }).then(function(res) { return res.json(); }),
+                fetch('/estimate_budget', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadBudget) }).then(function(res) { return res.json(); })
+            ])
+            .then(function(results) {
+                var tripData = results[0];
+                var budgetData = results[1];
+                btn.innerHTML = origBtnText;
+                if (tripData.error) {
+                    showToast('API Error: ' + tripData.error, 'error');
+                    return;
+                }
+                tripData.budget = budgetData;
+                renderResults(tripData);
+                showToast('Your personalized itinerary is ready!', 'success');
+            })
+            .catch(function() {
+                btn.innerHTML = origBtnText;
+                showToast('Failed to communicate with server.', 'error');
+            });
+        }
+
+        /* ── Results Display ── */
+
+        /* Map and Animation State */
+        var tripMap = null;
+        var tripItinerary = [];
+        var currentDay = 0;
+        var currentActivity = 0;
+        var isAutoPlaying = false;
+        var autoPlayTimer = null;
+        var mapMarkers = [];
+        var routeLines = [];
+        var accommodationMarker = null;
+
+        function renderResults(data) {
+            document.getElementById('wizardPanel').classList.add('hidden');
+            document.getElementById('resultsPanel').classList.remove('hidden');
+
+            /* Basic Info */
+            document.getElementById('resTravelersCount').textContent = state.persons;
+            document.getElementById('resDaysCount').textContent = state.days;
+            document.getElementById('resStayName').textContent = state.accName || 'Selected Stay';
+            document.getElementById('resStayMeta').textContent = (state.accArea || 'Djerba') + ', Tunisia';
+            document.getElementById('mapAccName').textContent = state.accName || 'Accommodation';
+
+            if (data.personality) {
+                document.getElementById('resPersonality').textContent = data.personality.charAt(0).toUpperCase() + data.personality.slice(1);
+                document.getElementById('resConfidence').textContent = data.confidence ? (data.confidence * 100).toFixed(0) + '%' : '---';
+            }
+
+            var tripStart = state.startDate || new Date();
+            var tripEnd = new Date(tripStart);
+            tripEnd.setDate(tripStart.getDate() + state.days);
+            document.getElementById('resDates').textContent = tripStart.toLocaleDateString('en-US', DATE_FORMAT) + ' - ' + tripEnd.toLocaleDateString('en-US', DATE_FORMAT);
+
+            /* Store itinerary for animation */
+            tripItinerary = data.itinerary || [];
+
+            /* Initialize Map */
+            initTripMap();
+
+            /* Create Day Pills */
+            createDayPills();
+
+            /* Show first day */
+            currentDay = 0;
+            currentActivity = -1;
+            showDay(0);
+
+            /* Budget Display with Animation */
+            if (data.budget && !data.budget.error) {
+                var b = data.budget;
+                animateBudget(b);
+            }
+
+            /* Transport Mode */
+            var transportEl = document.getElementById('resTransport');
+            if (transportEl) {
+                transportEl.textContent = transportLabels[state.transport] || state.transport;
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            /* Start auto-play after a short delay */
+            setTimeout(function() {
+                startAutoPlay();
+            }, 1500);
+        }
+
+        function initTripMap() {
+            /* Clean up existing map */
+            if (tripMap) {
+                tripMap.remove();
+                tripMap = null;
+            }
+            mapMarkers = [];
+            routeLines = [];
+
+            /* Initialize Leaflet map centered on Djerba */
+            var accLat = state.accLat || 33.8076;
+            var accLon = state.accLon || 10.8451;
+
+            tripMap = L.map('tripMap', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([accLat, accLon], 12);
+
+            /* Add tile layer - using CartoDB Positron for clean look */
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                maxZoom: 19
+            }).addTo(tripMap);
+
+            /* Add zoom control to bottom right */
+            L.control.zoom({ position: 'topright' }).addTo(tripMap);
+
+            /* Add accommodation marker */
+            var accIcon = L.divIcon({
+                className: 'custom-marker marker-accommodation',
+                html: '<span class="material-symbols-outlined" style="color:white;font-size:24px;">hotel</span>',
+                iconSize: [44, 44],
+                iconAnchor: [22, 22]
+            });
+
+            accommodationMarker = L.marker([accLat, accLon], { icon: accIcon })
+                .addTo(tripMap)
+                .bindPopup('<strong>' + (state.accName || 'Your Accommodation') + '</strong><br>Starting Point');
+        }
+
+        function createDayPills() {
+            var container = document.getElementById('dayPills');
+            var html = '';
+            for (var i = 0; i < tripItinerary.length; i++) {
+                var isActive = i === 0 ? 'active' : '';
+                html += '<button onclick="goToDay(' + i + ')" id="dayPill' + i + '" class="day-pill px-4 py-2 rounded-full text-sm font-bold text-slate-600 bg-slate-100 ' + isActive + '">Day ' + (i + 1) + '</button>';
+            }
+            container.innerHTML = html;
+        }
+
+        function showDay(dayIndex) {
+            if (dayIndex < 0 || dayIndex >= tripItinerary.length) return;
+
+            currentDay = dayIndex;
+            currentActivity = -1;
+
+            /* Update day pills */
+            for (var i = 0; i < tripItinerary.length; i++) {
+                var pill = document.getElementById('dayPill' + i);
+                if (pill) {
+                    if (i === dayIndex) {
+                        pill.classList.add('active');
+                    } else {
+                        pill.classList.remove('active');
+                    }
+                }
+            }
+
+            /* Update day title */
+            document.getElementById('currentDayTitle').textContent = 'Day ' + (dayIndex + 1);
+
+            /* Clear existing markers and routes */
+            clearMapOverlays();
+
+            /* Get day data */
+            var day = tripItinerary[dayIndex];
+            var places = day.places || [];
+
+            /* Update activity counter */
+            document.getElementById('activityCounter').textContent = '0 / ' + places.length;
+
+            /* Create activity cards (hidden initially) */
+            createActivityCards(places);
+
+            /* Update navigation buttons */
+            document.getElementById('btnPrevDay').disabled = dayIndex === 0;
+            document.getElementById('btnNextDay').disabled = dayIndex === tripItinerary.length - 1;
+
+            /* Center map on accommodation */
+            var accLat = state.accLat || 33.8076;
+            var accLon = state.accLon || 10.8451;
+            tripMap.flyTo([accLat, accLon], 12, { duration: 1 });
+
+            /* Reset progress */
+            updateProgress(0, places.length);
+
+            /* Update current activity info */
+            document.getElementById('currentActivityName').textContent = 'Your Accommodation';
+        }
+
+        function createActivityCards(places) {
+            var container = document.getElementById('activitiesList');
+            var html = '';
+
+            for (var i = 0; i < places.length; i++) {
+                var p = places[i];
+                var icon = getCategoryIcon(p.category);
+                html += '<div id="actCard' + i + '" class="activity-card p-4 rounded-xl border border-slate-200 bg-white">';
+                html += '<div class="flex items-start gap-3">';
+                html += '<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">';
+                html += '<span class="material-symbols-outlined text-primary">' + icon + '</span>';
+                html += '</div>';
+                html += '<div class="flex-1 min-w-0">';
+                html += '<p class="font-bold text-slate-800 truncate">' + p.name + '</p>';
+                html += '<p class="text-xs text-slate-500">' + (p.category || 'Activity') + '</p>';
+                html += '<div class="flex items-center gap-3 mt-2 text-xs text-slate-400">';
+                html += '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span>' + p.duration_hours + 'h</span>';
+                html += '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">straighten</span>' + p.distance_from_accommodation_km + ' km</span>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            }
+
+            if (places.length === 0) {
+                html = '<div class="text-center py-8 text-slate-400"><span class="material-symbols-outlined text-4xl mb-2">explore_off</span><p>No activities for this day</p></div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function getCategoryIcon(category) {
+            var icons = {
+                'Beach': 'beach_access',
+                'Museum': 'museum',
+                'Restaurant': 'restaurant',
+                'Market': 'store',
+                'Historic': 'castle',
+                'Nature': 'park',
+                'Adventure': 'paragliding',
+                'Cultural': 'temple_buddhist',
+                'Shopping': 'shopping_bag',
+                'Nightlife': 'nightlife',
+                'Spa': 'spa',
+                'Sports': 'sports_tennis'
+            };
+            return icons[category] || 'place';
+        }
+
+        function clearMapOverlays() {
+            /* Remove activity markers */
+            for (var i = 0; i < mapMarkers.length; i++) {
+                tripMap.removeLayer(mapMarkers[i]);
+            }
+            mapMarkers = [];
+
+            /* Remove route lines */
+            for (var j = 0; j < routeLines.length; j++) {
+                tripMap.removeLayer(routeLines[j]);
+            }
+            routeLines = [];
+        }
+
+        function showNextActivity() {
+            var day = tripItinerary[currentDay];
+            var places = day.places || [];
+
+            if (currentActivity >= places.length - 1) {
+                /* Day complete - go to next day or stop */
+                if (currentDay < tripItinerary.length - 1) {
+                    goToDay(currentDay + 1);
+                    return true;
+                } else {
+                    stopAutoPlay();
+                    showToast('Itinerary complete!', 'success');
+                    return false;
+                }
+            }
+
+            currentActivity++;
+            var activity = places[currentActivity];
+
+            /* Show activity card with animation */
+            var card = document.getElementById('actCard' + currentActivity);
+            if (card) {
+                card.classList.add('visible');
+                /* Remove active from previous */
+                for (var i = 0; i < places.length; i++) {
+                    var c = document.getElementById('actCard' + i);
+                    if (c) c.classList.remove('active');
+                }
+                card.classList.add('active');
+                /* Scroll card into view */
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            /* Update counter */
+            document.getElementById('activityCounter').textContent = (currentActivity + 1) + ' / ' + places.length;
+
+            /* Update current activity info */
+            document.getElementById('currentActivityName').textContent = activity.name;
+
+            /* Add marker to map */
+            addActivityMarker(activity, currentActivity);
+
+            /* Draw route from previous point */
+            drawRouteToActivity(activity, currentActivity);
+
+            /* Update progress */
+            updateProgress(currentActivity + 1, places.length);
+
+            return true;
+        }
+
+        function addActivityMarker(activity, index) {
+            var lat = activity.latitude || (state.accLat + (Math.random() - 0.5) * 0.05);
+            var lon = activity.longitude || (state.accLon + (Math.random() - 0.5) * 0.05);
+
+            var markerIcon = L.divIcon({
+                className: 'custom-marker marker-activity',
+                html: '<span class="marker-number">' + (index + 1) + '</span>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
+            });
+
+            var marker = L.marker([lat, lon], { icon: markerIcon })
+                .addTo(tripMap)
+                .bindPopup('<strong>' + activity.name + '</strong><br>' + (activity.category || 'Activity') + '<br>' + activity.duration_hours + ' hours');
+
+            mapMarkers.push(marker);
+
+            /* Fly to show both accommodation and new marker */
+            var bounds = L.latLngBounds([
+                [state.accLat, state.accLon],
+                [lat, lon]
+            ]);
+            
+            /* Include all current markers in bounds */
+            for (var i = 0; i < mapMarkers.length; i++) {
+                bounds.extend(mapMarkers[i].getLatLng());
+            }
+
+            tripMap.flyToBounds(bounds.pad(0.3), { duration: 1.5 });
+        }
+
+        function drawRouteToActivity(activity, index) {
+            var lat = activity.latitude || (state.accLat + (Math.random() - 0.5) * 0.05);
+            var lon = activity.longitude || (state.accLon + (Math.random() - 0.5) * 0.05);
+
+            var fromLat, fromLon;
+
+            if (index === 0) {
+                /* From accommodation */
+                fromLat = state.accLat;
+                fromLon = state.accLon;
+            } else {
+                /* From previous activity */
+                var prevActivity = tripItinerary[currentDay].places[index - 1];
+                fromLat = prevActivity.latitude || (state.accLat + (Math.random() - 0.5) * 0.05);
+                fromLon = prevActivity.longitude || (state.accLon + (Math.random() - 0.5) * 0.05);
+            }
+
+            /* Create curved path for visual appeal */
+            var midLat = (fromLat + lat) / 2 + (Math.random() - 0.5) * 0.01;
+            var midLon = (fromLon + lon) / 2 + (Math.random() - 0.5) * 0.01;
+
+            var routeLine = L.polyline([
+                [fromLat, fromLon],
+                [midLat, midLon],
+                [lat, lon]
+            ], {
+                color: '#137fec',
+                weight: 3,
+                opacity: 0.8,
+                dashArray: '10, 10',
+                className: 'animated-route'
+            }).addTo(tripMap);
+
+            routeLines.push(routeLine);
+        }
+
+        function updateProgress(current, total) {
+            var pct = total > 0 ? (current / total) * 100 : 0;
+            document.getElementById('animationProgress').style.width = pct + '%';
+        }
+
+        /* ── Day Navigation ── */
+
+        function goToDay(dayIndex) {
+            stopAutoPlay();
+            showDay(dayIndex);
+            /* Start showing activities */
+            setTimeout(function() {
+                startAutoPlay();
+            }, 500);
+        }
+
+        function prevDay() {
+            if (currentDay > 0) {
+                goToDay(currentDay - 1);
+            }
+        }
+
+        function nextDay() {
+            if (currentDay < tripItinerary.length - 1) {
+                goToDay(currentDay + 1);
+            }
+        }
+
+        /* ── Auto Play Controls ── */
+
+        function toggleAutoPlay() {
+            if (isAutoPlaying) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        }
+
+        function startAutoPlay() {
+            if (isAutoPlaying) return;
+
+            isAutoPlaying = true;
+            document.getElementById('btnPlayPause').innerHTML = '<span class="material-symbols-outlined">pause</span>';
+
+            function playNext() {
+                if (!isAutoPlaying) return;
+
+                var hasMore = showNextActivity();
+                if (hasMore && isAutoPlaying) {
+                    autoPlayTimer = setTimeout(playNext, 2000);
+                } else {
+                    stopAutoPlay();
+                }
+            }
+
+            playNext();
+        }
+
+        function stopAutoPlay() {
+            isAutoPlaying = false;
+            if (autoPlayTimer) {
+                clearTimeout(autoPlayTimer);
+                autoPlayTimer = null;
+            }
+            document.getElementById('btnPlayPause').innerHTML = '<span class="material-symbols-outlined">play_arrow</span>';
+        }
+
+        /* ── Budget Animation ── */
+
+        function animateBudget(budget) {
+            /* Show total with animation */
+            var totalEl = document.getElementById('resTotalCost');
+            animateNumber(totalEl, 0, budget.total_cost, '€');
+
+            setTimeout(function() {
+                document.getElementById('resPerDay').textContent = '€' + budget.per_day;
+                document.getElementById('resPerPerson').textContent = '€' + Math.round(budget.total_cost / state.persons);
+            }, 500);
+
+            /* Animate budget breakdown items */
+            var total = budget.activities_cost + budget.food_cost + budget.transport_cost;
+
+            setTimeout(function() {
+                var actItem = document.getElementById('budgetItemAct');
+                actItem.classList.add('visible');
+                document.getElementById('resCostAct').textContent = '€' + budget.activities_cost;
+                document.getElementById('resPercAct').style.width = ((budget.activities_cost / total) * 100) + '%';
+            }, 800);
+
+            setTimeout(function() {
+                var foodItem = document.getElementById('budgetItemFood');
+                foodItem.classList.add('visible');
+                document.getElementById('resCostFood').textContent = '€' + budget.food_cost;
+                document.getElementById('resPercFood').style.width = ((budget.food_cost / total) * 100) + '%';
+            }, 1100);
+
+            setTimeout(function() {
+                var transItem = document.getElementById('budgetItemTrans');
+                transItem.classList.add('visible');
+                document.getElementById('resCostTrans').textContent = '€' + budget.transport_cost;
+                document.getElementById('resPercTrans').style.width = ((budget.transport_cost / total) * 100) + '%';
+            }, 1400);
+        }
+
+        function animateNumber(element, start, end, prefix) {
+            prefix = prefix || '';
+            var duration = 1000;
+            var startTime = null;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                var progress = Math.min((timestamp - startTime) / duration, 1);
+                var current = Math.floor(start + (end - start) * progress);
+                element.textContent = prefix + current;
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        /* ── Initialization ── */
+
+        function restartPlanner() {
+            /* Stop any running animations */
+            stopAutoPlay();
+            
+            /* Clean up map */
+            if (tripMap) {
+                tripMap.remove();
+                tripMap = null;
+            }
+
+            document.getElementById('wizardPanel').classList.remove('hidden');
+            document.getElementById('resultsPanel').classList.add('hidden');
+            navigateWizard(1);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAccommodations();
+            _initDatePicker();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hm1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" fill="url(#hm1)"/>
+  <rect x="80" y="100" width="480" height="360" rx="20" fill="#F8FAFC" fill-opacity="0.18"/>
+  <path d="M120 390L220 320L320 360L420 260L520 330" stroke="#E2E8F0" stroke-width="10" stroke-linecap="round"/>
+  <text x="100" y="540" fill="#E2E8F0" font-family="Segoe UI, Arial" font-size="40" font-weight="700">Preference Data</text>
+</svg>

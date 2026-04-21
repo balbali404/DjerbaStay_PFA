@@ -1,0 +1,13 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#g3)"/>
+  <path d="M0 520C180 460 340 590 520 530C640 490 710 450 800 470V800H0V520Z" fill="#FEF3C7"/>
+  <path d="M0 460C170 420 360 560 540 490C640 450 730 420 800 430" stroke="#E0F2FE" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="660" cy="170" r="80" fill="#FDE68A"/>
+  <text x="120" y="160" fill="#E0F2FE" font-family="Segoe UI, Arial" font-size="48" font-weight="700">Beachfront</text>
+</svg>

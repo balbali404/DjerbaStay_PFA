@@ -1,0 +1,56 @@
+id,name,latitude,longitude,rating,price,tags,travel_type
+1,Restaurant Haroun,33.8774,10.8509,4.6,12,seafood tunisian waterfront grilled fish candlelight romantic dinner,romantic family
+2,Uncle Ali Poissons,33.8756,10.8561,4.6,7,seafood fresh fish local grill tunisian budget family,family budget foodie
+3,Restaurant La Bohème,33.8798,10.8576,4.9,18,mediterranean healthy salad gourmet fresh romantic fine dining,romantic luxury
+4,Les Palmiers Chez Neji,33.8089,10.9916,4.5,8,tunisian couscous brik harissa traditional local cuisine,culture family foodie
+5,Restaurant Lella Hadhria,33.8682,10.9954,4.6,14,seafood barbecue tunisian grill romantic dinner premium,romantic luxury family
+6,Restaurant Essofra,33.8753,10.8572,4.5,6,tunisian local grill culture family affordable,culture family budget
+7,Chez Chouchou,33.8728,10.8560,4.3,5,mediterranean lamb budget family affordable local,budget family
+8,Djerba Nova,33.8339,10.9764,4.7,20,italian french fusion gourmet fine dining romantic luxury,romantic luxury
+9,Café Ftouhi,33.8760,10.8565,4.2,3,cafe tea pastry breakfast budget local morning,budget solo culture
+10,Le Pirate,33.8650,10.9800,4.4,11,seafood beach grill sunset romantic coastal evening view,beach romantic adventure
+11,Restaurant Le Moulin,33.8098,10.9502,4.3,6,tunisian local traditional couscous merguez affordable,culture budget family
+12,Blue Beach Restaurant,33.8620,10.9835,4.5,15,seafood beach view cocktails romantic sunset premium luxury,beach romantic luxury
+13,Restaurant El Foundouk,33.8745,10.8555,4.4,8,tunisian traditional couscous brik local cuisine culture,culture family foodie
+14,Maison des Saveurs,33.8685,10.8590,4.3,10,tunisian gourmet local cuisine cooking spices merguez harissa,foodie culture
+15,Restaurant Central Houmt Souk,33.8762,10.8570,4.2,5,tunisian affordable local daily menu couscous lamb,budget family culture
+16,La Fontaine Restaurant,33.8638,10.9872,4.3,12,mediterranean european salad grilled fish resort zone touristique,luxury romantic family
+17,Dar Hassine Haddad,33.8750,10.8548,4.7,18,fine dining traditional tunisian authentic decor romantic heritage,romantic luxury foodie
+18,Café de la Poste,33.8765,10.8574,4.1,3,cafe breakfast tea pastry local morning budget,budget solo culture
+19,Restaurant Les Trois Moutons,33.8755,10.8563,4.4,7,tunisian lamb couscous harissa local affordable culture,culture family budget
+20,Pizzeria Napoli Djerba,33.8740,10.8558,4.0,5,pizza italian budget casual family friendly,budget family
+21,Restaurant Dar Faiza,33.8712,10.8587,4.5,9,tunisian traditional authentic heritage home cooking,culture family foodie
+22,Le Berbère,33.8082,10.9920,4.4,7,berber tunisian traditional couscous family local affordable,culture family budget
+23,Restaurant Chez Salah,33.8092,10.9912,4.3,6,fresh fish grilled seafood local midoun affordable family,family budget foodie
+24,Sunset Beach Bar & Grill,33.8703,10.9888,4.2,14,seafood grill beach bar sunset cocktails romantic view,beach romantic luxury
+25,Restaurant Menara,33.8647,10.9858,4.3,12,tunisian mediterranean resort grill seafood premium,luxury romantic family
+26,Le Restaurant du Port,33.8780,10.8510,4.4,8,seafood harbour port fresh fish tunisian grilled local waterfront,family budget foodie
+27,La Terrasse Restaurant,33.8655,10.9800,4.2,10,mediterranean european salad pasta grilled resort view terrace,luxury romantic family
+28,Café Tanit,33.8758,10.8566,4.1,3,cafe mint tea breakfast pastry local culture budget morning,budget solo culture
+29,Restaurant Dar Ben Gacem,33.8744,10.8553,4.5,16,fine dining tunisian heritage decor authentic flavors home cooking,romantic luxury foodie
+30,Restaurant L'Amphitrite,33.8648,10.9812,4.4,14,seafood mediterranean grill premium beach view romantic zone touristique,beach romantic luxury
+31,Café Jugurtha,33.8762,10.8570,4.0,3,cafe tea snacks local budget quick bite morning culture,budget solo culture
+32,Restaurant Al Jazira,33.8094,10.9918,4.3,7,tunisian midoun local couscous fish merguez family affordable,culture family budget
+33,Restaurant Le Neptune,33.8640,10.9815,4.3,13,seafood beach grill view zone touristique premium romantic,beach romantic luxury
+34,Chez Mbarek,33.8730,10.8558,4.2,4,tunisian local cheap daily menu lamb couscous budget authentic,budget family culture
+35,Restaurant Le Calypso,33.8659,10.9845,4.2,12,mediterranean french grilled fish resort romantic candlelit,romantic luxury
+36,Café Sidi Driss,33.8764,10.8562,4.1,3,cafe tea shisha local morning culture budget artisan,budget solo culture
+37,Restaurant L'Olivier,33.8062,10.9700,4.4,8,tunisian erriadh village local traditional authentic homemade couscous,culture family foodie
+38,Pizza Corner Djerba,33.8748,10.8561,3.9,4,pizza italian casual budget takeaway family,budget family
+39,Café Ezzaitouna,33.8756,10.8558,4.2,3,cafe olive tree tea local morning culture peaceful,budget solo culture
+40,Restaurant El Bostane,33.8641,10.9862,4.3,11,tunisian mediterranean grill resort zone touristique seafood family,luxury family romantic
+41,La Casbah Restaurant,33.8750,10.8554,4.5,10,tunisian heritage castle medina decor traditional food,culture family foodie
+42,Restaurant Chez Mourad,33.7438,10.7520,4.4,6,fresh grilled fish ajim port local seafood family budget,family budget foodie
+43,Restaurant La Médina,33.8746,10.8562,4.3,7,tunisian medina local couscous merguez brik culture,culture family budget
+44,La Turquoise Restaurant,33.8636,10.9872,4.3,13,seafood tunisian beach view romantic premium cocktails resort,beach romantic luxury
+45,Restaurant Dar Lella,33.8715,10.8582,4.4,9,tunisian authentic home cooking heritage family warmth traditional,culture family foodie
+46,Chez Hamda,33.6960,10.8635,4.2,5,guellala local fish couscous pottery village affordable authentic,culture budget family
+47,Restaurant Le Cabanon,33.8660,10.9820,4.2,11,beachfront grilled fish seafood cocktails sunset romantic casual,beach romantic adventure
+48,Café Soleil,33.8087,10.9913,4.0,3,cafe midoun breakfast pastry tea budget morning local,budget solo family
+49,Restaurant Chez Ahmed,33.8735,10.8555,4.1,5,tunisian local daily lamb couscous harissa cheap budget,budget culture family
+50,Café Le Paris,33.8768,10.8573,4.1,3,french café breakfast croissant coffee local culture budget morning,budget solo culture
+51,L'Auberge Restaurant,33.8645,10.9835,4.2,11,french tunisian fusion resort gourmet romantic couples,romantic luxury
+52,Restaurant Ali Baba,33.8742,10.8564,4.3,6,tunisian couscous brik lamb grilled local culture affordable,culture family budget
+53,Restaurant L'Atlantique,33.8658,10.9852,4.3,12,atlantic seafood grill french tunisian resort premium,luxury romantic family
+54,Café Mariem,33.8060,10.9695,4.3,3,cafe village erriadh quiet tea culture local budget morning,budget solo culture
+55,Restaurant Dar Zarrouk,33.8690,10.8598,4.6,17,fine dining tunisian thalassa spa romantic luxury premium gourmet,romantic luxury foodie
