@@ -205,13 +205,13 @@ def parse_required_str(data: dict[str, Any], key: str) -> str:
 # Suggestion model logic
 # =============================================================================
 
-def _require_suggestion_bundle() -> dict[str, Any]:
+def require_suggestion_bundle() -> dict[str, Any]:
     if not SUGGESTION_BUNDLE:
         raise RuntimeError("Suggestion model is not loaded")
     return SUGGESTION_BUNDLE
 
 
-def _get_place_vectors(bundle: dict[str, Any]):
+def resolve_place_vectors(bundle: dict[str, Any]):
     """Use stored place vectors when possible, else recompute."""
     place_vectors = bundle.get("place_vectors")
     if place_vectors is not None and getattr(place_vectors, "shape", (0,))[0] == len(PLACES_DF):
@@ -222,7 +222,7 @@ def _get_place_vectors(bundle: dict[str, Any]):
 
 def predict_personality(user_interests: str) -> tuple[str, float]:
     """Predict traveler personality from interests using suggestion model."""
-    bundle = _require_suggestion_bundle()
+    bundle = require_suggestion_bundle()
 
     expanded = expand_query(user_interests, bundle["synonym_map"])
     user_vector = bundle["profile_vectorizer"].transform([expanded])
@@ -252,12 +252,12 @@ def predict_personality(user_interests: str) -> tuple[str, float]:
 
 def score_places(user_interests: str, personality: str) -> pd.DataFrame:
     """Score places using interest similarity, ratings, and travel-type match."""
-    bundle = _require_suggestion_bundle()
+    bundle = require_suggestion_bundle()
     places_df = PLACES_DF.copy()
 
     expanded = expand_query(user_interests, bundle["synonym_map"])
     user_vector = bundle["place_vectorizer"].transform([expanded])
-    place_vectors = _get_place_vectors(bundle)
+    place_vectors = resolve_place_vectors(bundle)
 
     places_df["interest_score"] = cosine_similarity(user_vector, place_vectors)[0]
     places_df["travel_score"] = places_df["travel_type"].apply(
@@ -378,7 +378,7 @@ def plan_trip(
 # Budget model logic
 # =============================================================================
 
-def _require_budget_models() -> tuple[Any, Any, list[str]]:
+def require_budget_models() -> tuple[Any, Any, list[str]]:
     if BUDGET_LR_MODEL is None or BUDGET_RIDGE_MODEL is None:
         raise RuntimeError("Budget model is not loaded")
     return BUDGET_LR_MODEL, BUDGET_RIDGE_MODEL, BUDGET_FEATURE_NAMES
@@ -412,7 +412,7 @@ def build_budget_features(
 
 def estimate_budget(days: int, persons: int, budget_level: int, transport: str) -> dict[str, Any]:
     """Estimate total and breakdown budget using both regressors."""
-    lr_model, ridge_model, feature_names = _require_budget_models()
+    lr_model, ridge_model, feature_names = require_budget_models()
 
     input_frame = build_budget_features(days, persons, budget_level, transport, feature_names)
 
@@ -473,6 +473,7 @@ def get_accommodations():
 
 @app.route("/plan_trip", methods=["POST"])
 def api_plan_trip():
+    # This endpoint powers the itinerary generator used by the Express backend.
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
         return jsonify({"error": "Request body must be valid JSON"}), 400
@@ -508,6 +509,7 @@ def api_plan_trip():
 
 @app.route("/estimate_budget", methods=["POST"])
 def api_estimate_budget():
+    # This endpoint estimates budget totals and category split (activities/food/transport).
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
         return jsonify({"error": "Request body must be valid JSON"}), 400

@@ -1,6 +1,7 @@
 import type {
   Accommodation,
   BudgetResponse,
+  MlUsage,
   TripPlanResponse,
 } from "@/lib/aiClient";
 
@@ -29,6 +30,8 @@ export type PlannerState = {
 };
 
 export type TripResult = TripPlanResponse & { budget?: BudgetResponse };
+
+export type PlannerUsage = MlUsage;
 
 export type ToastType = "success" | "error" | "warning";
 

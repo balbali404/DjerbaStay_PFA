@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+
+import { AuthSessionProvider } from "@/lib/authSession";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,11 +20,13 @@ export default function RootLayout({
       <body
         className="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100"
       >
-        <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-          <div className="layout-container flex h-full grow flex-col">
-            {children}
+        <AuthSessionProvider>
+          <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+            <div className="layout-container flex h-full grow flex-col">
+              {children}
+            </div>
           </div>
-        </div>
+        </AuthSessionProvider>
       </body>
     </html>
   );

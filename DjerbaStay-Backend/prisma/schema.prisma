@@ -1,13 +1,172 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum SubscriptionCode {
+  FREE
+  PLUS
+  PREMIUM
+}
+
+enum TransportMode {
+  taxi
+  car_rental
+  bus
+}
+
+model SubscriptionPlan {
+  id                String           @id @default(cuid())
+  code              SubscriptionCode @unique
+  name              String
+  description       String
+  monthlyMlRequests Int?
+  monthlyPriceUsd   Float
+  features          Json?
+  users             User[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+model User {
+  id             String         @id @default(cuid())
+  fullName       String
+  email          String         @unique
+  passwordHash   String
+  planId         String
+  plan           SubscriptionPlan @relation(fields: [planId], references: [id])
+  refreshTokens  RefreshToken[]
+  monthlyUsages  MonthlyUsage[]
+  plannerRequests PlannerRequest[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model MonthlyUsage {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  monthStart DateTime
+  mlRequests Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, monthStart])
+  @@index([monthStart])
+}
+
+model Accommodation {
+  id              String           @id @default(cuid())
+  externalId      Int              @unique
+  name            String
+  type            String?
+  area            String?
+  imageFileName   String?
+  latitude        Float
+  longitude       Float
+  rating          Float?
+  plannerRequests PlannerRequest[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Place {
+  id            String   @id @default(cuid())
+  externalId    Int      @unique
+  name          String
+  type          String
+  category      String
+  imageFileName String?
+  latitude      Float
+  longitude     Float
+  rating        Float?
+  durationHours Float
+  price         Float?
+  tags          String
+  travelType    String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Restaurant {
+  id         String   @id @default(cuid())
+  externalId Int      @unique
+  name       String
+  imageFileName String?
+  latitude   Float
+  longitude  Float
+  rating     Float?
+  price      Float?
+  tags       String
+  travelType String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TravelerProfile {
+  id            String   @id @default(cuid())
+  personality   String   @unique
+  keywords      String
+  imageFileName String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Synonym {
+  id         String   @id @default(cuid())
+  term       String   @unique
+  expansion  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TripBudgetSample {
+  id              String        @id @default(cuid())
+  externalRowId   Int           @unique
+  days            Int
+  persons         Int
+  budgetLevel     Int
+  transport       TransportMode
+  totalActivities Float
+  totalFood       Float
+  totalTransport  Float
+  totalCost       Float
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model PlannerRequest {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accommodationId String
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  interests       String
+  days            Int
+  persons         Int
+  budgetLevel     Int
+  transport       TransportMode
+  tripPlan        Json
+  budgetBreakdown Json
+  flaskPlanStatus Int
+  flaskBudgetStatus Int
+  createdAt       DateTime      @default(now())
+
+  @@index([userId, createdAt])
+  @@index([accommodationId])
 }

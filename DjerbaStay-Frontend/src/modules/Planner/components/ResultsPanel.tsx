@@ -6,6 +6,7 @@ import TripMap from "./TripMap";
 
 type ResultsPanelProps = {
   results: TripResult;
+  plannerRequestId: string | null;
   state: PlannerState;
   dayIndex: number;
   activityIndex: number;
@@ -27,6 +28,7 @@ function percentWidth(value: number, total: number) {
 
 export default function ResultsPanel({
   results,
+  plannerRequestId,
   state,
   dayIndex,
   activityIndex,
@@ -76,6 +78,12 @@ export default function ResultsPanel({
             <span>{state.persons} travelers</span>
             <span className="text-slate-300">•</span>
             <span>{state.days} days</span>
+            {plannerRequestId ? (
+              <>
+                <span className="text-slate-300">•</span>
+                <span className="font-semibold text-primary">Request #{plannerRequestId.slice(0, 8)}</span>
+              </>
+            ) : null}
           </p>
         </div>
 
