@@ -1,0 +1,61 @@
+hotel_id,name,type,area,latitude,longitude,rating,price_euro
+3792395,Hotel Diar Yassine,hotel,Zone Touristique,33.836183,10.999924,7.0,19
+3917390,Résidence Chahd,hotel,Mezraia,33.866921,10.951925,5.8,19
+48477488,Hyatt Stones,hotel,Houmt Souk,33.878701,10.870768,2.0,24
+22150958,Hotel les Palmes d'Or,hotel,Houmt Souk,33.878527,10.861356,7.6,25
+132683825,Le Petit Palais Djerba & Spa,hotel,Zone Touristique,33.833012,11.004802,8.0,25
+4045883,Djerba Castille – Family Only,hotel,Zone Touristique,33.765599,11.023246,7.7,28
+3911319,Hotel de Charme et Spa Dar El Bhar,hotel,Mezraia,33.862416,10.977433,8.3,29
+124445846,Hotel Djerba Inn,hotel,Djerba Midoun,33.805739,10.990956,8.7,29
+4604413,Le Grand Hotel Djerba,hotel,Houmt Souk,33.875209,10.857198,6.8,29
+3798512,Hotel le Beau Sejour,hotel,Houmt Souk,33.868414,10.962079,6.3,32
+10525714,Jlidi Residence,maison,Djerba,33.832798,10.976324,2.0,32
+79030558,Hotel Bougainvillier Djerba,hotel,Zone Touristique,33.825241,11.043028,7.7,33
+10675958,Hotel Venice Beach- Families and Couples Only,hotel,Djerba,33.841513,10.996783,6.9,33
+10736646,Hotel Sidi Mansour Resort & Spa,hotel,Zone Touristique,33.825007,11.04013,8.3,34
+9944910,Palm Djerba Suites,hotel,Mezraia,33.853016,10.979809,8.4,35
+5599972,Djerba Aqua Resort,hotel,Houmt Souk,33.833214,11.006406,8.4,36
+17502122,Monarque Dar Jerba Narjess,maison,Djerba,33.830406,11.033273,6.2,36
+10750704,Club Palm Azur Families and Couples,hotel,Aghir,33.763835,11.019566,7.2,39
+3443950,Le Petit Palais,hotel,Houmt Souk,33.855621,10.98327,6.3,39
+3044172,El Mouradi Djerba Menzel,hotel,Djerba Midoun,33.780397,11.055997,6.8,41
+17501762,Hotel Djerba Saray,hotel,Zone Touristique,33.837205,10.991961,4.6,41
+7093029,Joya Paradise,hotel,Zone Touristique,33.841673,10.993408,7.9,41
+3073554,Zenon Djerba,hotel,Zone Touristique,33.851949,10.985875,7.6,42
+3176703,Djerba Resort- Families and Couples Only,hotel,Zone Touristique,33.839764,10.994119,7.6,43
+22857492,Al Jazira Beach & Spa- All Inclusive - Families and Couples Only,hotel,Mezraia,33.865652,10.968717,9.4,44
+758612,Djerba Holiday Beach,hotel,Mezraia,33.861517,10.972918,8.5,44
+110231714,Le Patio de Mezraya,hotel,Mezraia,33.860797,10.954099,8.9,44
+3792531,Seabel Aladin Djerba,hotel,Zone Touristique,33.764425,11.021697,8.6,44
+21888556,Aljazira Beach & Spa  -  Families and Couples Only,hotel,Mezraia,33.865908,10.968326,8.4,45
+3445105,Cesar Thalasso,hotel,Djerba Midoun,33.832135,11.006091,8.8,45
+3450211,Les Jardins de Toumana,hotel,Djerba,33.848735,10.987174,8.6,45
+108388421,Tmk Marine Beach by Turismark,hotel,Djerba Midoun,33.83706,11.005536,7.1,45
+4532863,Vincci Helios Beach,hotel,Djerba,33.817838,11.052758,7.5,47
+101240682,Hôtel Djerba Authentique - Au Centre de Midoun,hotel,Djerba Midoun,33.807591,10.992564,9.1,49
+96736418,Vincci Dar Midoun,maison,Zone Touristique,33.844096,10.996425,8.4,49
+45967004,Dar Lola Djerba,maison,Houmt Souk,33.876927,10.858876,9.3,50
+123998102,Dream Garden Djerba,hotel,Zone Touristique,33.857874,10.970559,9.5,50
+17507971,Fiesta Beach Djerba,hotel,Zone Touristique,33.849455,10.988334,8.0,50
+9226094,Hotel Djerba Erriadh,hotel,Houmt Souk,33.876837,10.858825,7.8,50
+3066572,The Ksar Djerba Charming Hotel & Spa,hotel,Djerba Midoun,33.842587,10.996183,7.9,50
+22869991,Les Quatre Saisons Aqua Park Resort & Thalasso,hotel,Djerba,33.84391,10.994618,8.5,53
+2256147,Djerba Sun Beach Hotel and Spa,hotel,Sidi Mahrez,33.859364,10.97463,8.8,55
+9409884,Dar Chick Yahia Ile de Djerba,maison,Djerba,33.780706,10.744168,8.9,58
+21837548,Hotel Telemaque Beach & Spa - Families and Couples Only,hotel,Zone Touristique,33.861457,10.978454,8.5,60
+3793650,Dar Elbidha,maison,Ajim,33.751418,10.729153,8.9,62
+758615,Hotel Djerba Orient,hotel,Sidi Mahrez,33.865554,10.961873,6.8,62
+4329290,Iberostar Waves Mehari Djerba,hotel,Djerba Midoun,33.82712,11.020967,8.7,65
+2195460,Djerba Plaza Thalasso & Spa,hotel,Zone Touristique,33.831071,11.007978,8.0,77
+9031498,Royal Garden Palace - Families and Couples,hotel,Zone Touristique,33.826824,11.017924,8.3,80
+3030736,Iberostar Selection Eolia Djerba,hotel,Djerba Midoun,33.840544,10.999579,9.0,81
+22830790,Tui Blue Palm Beach Palace Djerba - Adult Only,hotel,Zone Touristique,33.851195,10.989905,8.8,98
+3459632,Dar Salem,maison,Mezraia,33.864427,10.97078,7.0,106
+22911314,Palm Beach Club Djerba - All Inclusive,hotel,Houmt Souk,33.853263,10.988045,8.0,107
+2114393,Radisson Blu Palace Resort and Thalasso,hotel,Houmt Souk,33.870614,10.959173,8.9,107
+22085477,Tui Magic Life Penelope Beach,hotel,Houmt Souk,33.845964,10.99256,9.0,109
+758611,Robinson Djerba Bahiya - All Inclusive,hotel,Zone Touristique,33.823082,11.053963,8.7,114
+3068045,Seabel Rym Beach Djerba,hotel,Djerba Midoun,33.828039,11.046779,8.3,116
+22830854,Le Grand Hotels des Thermes,hotel,Houmt Souk,33.853713,10.984254,5.6,124
+3450150,Hasdrubal Prestige Thalassa & Spa Djerba,hotel,Houmt Souk,33.859831,10.98025,8.4,125
+2114389,Ulysse Djerba Thalasso & Spa,hotel,Houmt Souk,33.870032,10.962538,8.3,171
