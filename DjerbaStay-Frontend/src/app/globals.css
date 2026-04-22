@@ -11,6 +11,10 @@
   --radius-full: 9999px;
 }
 
+body {
+  font-family: var(--font-display);
+}
+
 .traditional-pattern {
   background-image: radial-gradient(
     circle at 2px 2px,
@@ -222,7 +226,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 .ml-marker-home-glyph {
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: inherit;
   font-weight: 800;
   font-size: 16px;
   letter-spacing: 0.02em;

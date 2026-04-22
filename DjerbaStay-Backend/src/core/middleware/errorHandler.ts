@@ -4,14 +4,11 @@ interface AppError extends Error {
   statusCode?: number;
 }
 
-/**
- * Global error handler — returns structured JSON errors.
- */
 export function errorHandler(err: AppError, _req: Request, res: Response, _next: NextFunction): void {
   const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+  const message = err.message || "Internal server error";
 
-  console.error(`[Error] ${statusCode} — ${message}`);
+  console.error(`[error] ${statusCode} - ${message}`);
   if (process.env.NODE_ENV === "development") {
     console.error(err.stack);
   }

@@ -1,9 +1,9 @@
-import { proxyAiRequest } from "@/lib/aiProxy";
-
 export async function POST(request: Request) {
-  const body = await request.text();
-  return proxyAiRequest("/estimate_budget", {
-    method: "POST",
-    body,
-  });
+  void request;
+  return Response.json(
+    {
+      error: "Deprecated endpoint. Use POST /api/planner/generate on Express backend.",
+    },
+    { status: 410 }
+  );
 }

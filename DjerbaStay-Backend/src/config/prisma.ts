@@ -2,14 +2,18 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
-// Get connection string from environment
-const connectionString = process.env.DATABASE_URL;
+const databaseUrl = process.env.DATABASE_URL;
 
-// Initialize pg pool
-const pool = new pg.Pool({ connectionString });
+if (!databaseUrl) {
+  throw new Error("Missing DATABASE_URL environment variable");
+}
+
+const pool = new pg.Pool({
+  connectionString: databaseUrl,
+});
+
 const adapter = new PrismaPg(pool);
 
-// Singleton Prisma Client — reused across the app
 const prisma = new PrismaClient({
   adapter,
   log: process.env.NODE_ENV === "development" ? ["query", "warn", "error"] : ["error"],

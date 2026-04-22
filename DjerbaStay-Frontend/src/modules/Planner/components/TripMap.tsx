@@ -111,8 +111,13 @@ export default function TripMap({
 
       progress = (progress + 0.03) % 1;
       const head = progress;
-      const tail = Math.max(0, head - 0.18);
-      const lead = Math.min(1, head + 0.08);
+      const epsilon = 0.0001;
+      const rawTail = Math.max(0, head - 0.18);
+      const rawLead = Math.min(1, head + 0.08);
+
+      const tail = Math.max(epsilon, rawTail);
+      const animatedHead = Math.min(1 - 2 * epsilon, Math.max(tail + epsilon, head));
+      const lead = Math.min(1 - epsilon, Math.max(animatedHead + epsilon, rawLead));
 
       map.setPaintProperty(ROUTE_LAYER_ID, "line-gradient", [
         "interpolate",
@@ -122,7 +127,7 @@ export default function TripMap({
         "rgba(2,132,199,0.25)",
         tail,
         "rgba(2,132,199,0.25)",
-        head,
+        animatedHead,
         "rgba(34,211,238,1)",
         lead,
         "rgba(2,132,199,0.28)",

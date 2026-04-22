@@ -1,13 +1,14 @@
 import Image from "next/image";
 
 import Icon from "@/components/Icon";
-import type { Accommodation } from "@/lib/aiClient";
+import type { Accommodation, MlUsage } from "@/lib/aiClient";
 import { costMap, groupCards, transportCards, vibeCards } from "../constants";
 import type { PlannerState, WizardStep } from "../types";
 import { classNames, formatDateRange } from "../utils";
 
 type WizardPanelProps = {
   state: PlannerState;
+  usage: MlUsage | null;
   filteredAccommodations: Accommodation[];
   loadingAccommodations: boolean;
   isGenerating: boolean;
@@ -39,6 +40,7 @@ function stepProgress(step: WizardStep) {
 
 export default function WizardPanel({
   state,
+  usage,
   filteredAccommodations,
   loadingAccommodations,
   isGenerating,
@@ -56,6 +58,7 @@ export default function WizardPanel({
   onGenerate,
 }: WizardPanelProps) {
   const progress = stepProgress(state.step);
+  const hasUsageLimit = usage?.limit !== null && usage?.limit !== undefined;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -407,6 +410,27 @@ export default function WizardPanel({
               <p className="text-sm text-slate-600 leading-relaxed">
                 Our ML engine analyzes booking patterns in Djerba to build a tailored itinerary.
               </p>
+
+              {usage && (
+                <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3">
+                  <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-primary">
+                    <span>{usage.planCode} plan usage</span>
+                    {hasUsageLimit ? (
+                      <span>
+                        {usage.used}/{usage.limit}
+                      </span>
+                    ) : (
+                      <span>Unlimited</span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {hasUsageLimit
+                      ? `${usage.remaining} request(s) remaining this month.`
+                      : "Unlimited monthly ML requests."}
+                  </p>
+                </div>
+              )}
+
               <div className="mt-4 pt-4 border-t border-slate-100">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs font-bold text-slate-500">Estimated Daily Cost</span>

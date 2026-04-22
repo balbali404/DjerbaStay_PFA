@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import Icon from "@/components/Icon";
 import {
-  estimateBudget,
+  generatePlanner,
+  getMlUsage,
   getAccommodations,
-  planTrip,
+  getPlannerById,
   type Accommodation,
+  type MlUsage,
 } from "@/lib/aiClient";
+import { useAuthSession } from "@/lib/authSession";
 import { MAX_DAYS } from "./constants";
 import ResultsPanel from "./components/ResultsPanel";
 import WizardPanel from "./components/WizardPanel";
@@ -38,10 +43,16 @@ const initialState: PlannerState = {
 };
 
 export default function Planner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const plannerRequestIdFromUrl = searchParams.get("requestId");
+  const { isAuthenticated, isInitializing } = useAuthSession();
+
   const [state, setState] = useState<PlannerState>(initialState);
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [filteredAccommodations, setFilteredAccommodations] = useState<Accommodation[]>([]);
   const [loadingAccommodations, setLoadingAccommodations] = useState(true);
+  const [loadingSavedPlanner, setLoadingSavedPlanner] = useState(false);
   const [toast, setToast] = useState<ToastMessage>(null);
   const [results, setResults] = useState<TripResult | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -49,6 +60,8 @@ export default function Planner() {
   const [activityIndex, setActivityIndex] = useState(-1);
   const [autoPlay, setAutoPlay] = useState(false);
   const [budgetRevealStep, setBudgetRevealStep] = useState(0);
+  const [usage, setUsage] = useState<MlUsage | null>(null);
+  const [plannerRequestId, setPlannerRequestId] = useState<string | null>(null);
 
   const itinerary = useMemo(() => results?.itinerary ?? [], [results]);
 
@@ -66,12 +79,20 @@ export default function Planner() {
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchAccommodations() {
+    async function loadPlannerData() {
       try {
-        const data = await getAccommodations();
+        const [accommodationData, usageData] = await Promise.all([
+          getAccommodations(),
+          isAuthenticated ? getMlUsage().catch(() => null) : Promise.resolve(null),
+        ]);
+
         if (!isMounted) return;
-        setAccommodations(data);
-        setFilteredAccommodations(data);
+
+        setAccommodations(accommodationData);
+        setFilteredAccommodations(accommodationData);
+        if (usageData) {
+          setUsage(usageData);
+        }
       } catch {
         if (!isMounted) return;
         showToast("Failed to load accommodations", "error");
@@ -82,12 +103,61 @@ export default function Planner() {
       }
     }
 
-    fetchAccommodations();
+    loadPlannerData();
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setLoadingSavedPlanner(false);
+      return;
+    }
+
+    if (!plannerRequestIdFromUrl) {
+      setPlannerRequestId(null);
+      return;
+    }
+
+    let isMounted = true;
+    setLoadingSavedPlanner(true);
+
+    getPlannerById(plannerRequestIdFromUrl)
+      .then((data) => {
+        if (!isMounted) return;
+
+        setPlannerRequestId(data.id);
+        setResults({ ...data.tripPlan, budget: data.budget });
+        setState((prev) => ({
+          ...prev,
+          step: 3,
+          days: data.days,
+          persons: data.persons,
+          budgetLevel: data.budgetLevel as 1 | 2 | 3,
+          transport: data.transport,
+          accId: data.accommodation.id,
+          accName: data.accommodation.name,
+          accLat: data.accommodation.latitude,
+          accLon: data.accommodation.longitude,
+          accArea: data.accommodation.area || "Djerba",
+        }));
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        showToast("Failed to load planner request by ID", "error");
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoadingSavedPlanner(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [plannerRequestIdFromUrl, isAuthenticated]);
 
   useEffect(() => {
     if (!results?.budget) return;
@@ -208,7 +278,7 @@ export default function Planner() {
   }
 
   async function generateStay() {
-    if (!state.accName || state.accLat === null || state.accLon === null) {
+    if (!state.accId || !state.accName || state.accLat === null || state.accLon === null) {
       showToast("Please select an accommodation", "error");
       navigateStep(3);
       return;
@@ -220,28 +290,22 @@ export default function Planner() {
     setDayIndex(0);
 
     try {
-      const tripPayload = {
+      const payload = {
+        accommodationId: state.accId,
         interests: buildInterests(state),
         days: state.days,
-        accommodation_name: state.accName,
-        accommodation_lat: state.accLat,
-        accommodation_lon: state.accLon,
-      };
-
-      const budgetPayload = {
-        days: state.days,
         persons: state.persons,
-        budget_level: state.budgetLevel,
+        budgetLevel: state.budgetLevel,
         transport: state.transport,
       };
 
-      const [tripData, budgetData] = await Promise.all([
-        planTrip(tripPayload),
-        estimateBudget(budgetPayload),
-      ]);
+      const response = await generatePlanner(payload);
 
-      setResults({ ...tripData, budget: budgetData });
+      setPlannerRequestId(response.requestId);
+      setUsage(response.usage);
+      setResults({ ...response.tripPlan, budget: response.budget });
       showToast("Your personalized itinerary is ready!", "success");
+      router.replace(`/planner?requestId=${response.requestId}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
 
       setTimeout(() => {
@@ -255,16 +319,43 @@ export default function Planner() {
   }
 
   function resetPlanner() {
+    setPlannerRequestId(null);
     setResults(null);
     setAutoPlay(false);
     setDayIndex(0);
     setActivityIndex(-1);
     setState((prev) => ({ ...prev, step: 1 }));
+    router.replace("/planner");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
     <div className="max-w-7xl mx-auto w-full px-6 lg:px-20 py-10">
+      {!isInitializing && !isAuthenticated ? (
+        <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <h2 className="text-2xl font-black text-slate-900">Sign in to use the AI planner</h2>
+          <p className="mt-3 text-slate-500">
+            Planner generation is secured through the Express backend and requires your account session.
+          </p>
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <Link
+              href="/login"
+              className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary/90"
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              className="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50"
+            >
+              Register
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
+      {isInitializing || !isAuthenticated ? null : (
+        <>
       {toast && (
         <div className="toast-container">
           <div className={`toast toast-${toast.type}`}>
@@ -286,6 +377,7 @@ export default function Planner() {
       {results ? (
         <ResultsPanel
           results={results}
+          plannerRequestId={plannerRequestId}
           state={state}
           dayIndex={dayIndex}
           activityIndex={activityIndex}
@@ -309,9 +401,10 @@ export default function Planner() {
       ) : (
         <WizardPanel
           state={state}
+          usage={usage}
           filteredAccommodations={filteredAccommodations}
-          loadingAccommodations={loadingAccommodations}
-          isGenerating={isGenerating}
+          loadingAccommodations={loadingAccommodations || loadingSavedPlanner}
+          isGenerating={isGenerating || loadingSavedPlanner}
           onNavigateStep={navigateStep}
           onSetVibe={(vibe) => setState((prev) => ({ ...prev, vibe }))}
           onSetBudgetLevel={(budgetLevel) =>
@@ -327,6 +420,8 @@ export default function Planner() {
           onSetTransport={(transport) => setState((prev) => ({ ...prev, transport }))}
           onGenerate={generateStay}
         />
+      )}
+        </>
       )}
     </div>
   );

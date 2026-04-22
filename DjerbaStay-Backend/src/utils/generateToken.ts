@@ -1,30 +1,50 @@
+import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
-import { Response } from "express";
-import type { JwtPayload } from "../core/middleware/auth.middleware.js";
+import type { AccessTokenPayload } from "../core/middleware/auth.middleware";
 
-const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET as string;
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
-const JWT_ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
-const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
-const COOKIE_MAX_AGE_MS = parseInt(process.env.COOKIE_MAX_AGE_MS || "604800000", 10);
+function requiredEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`FATAL: missing environment variable ${name}`);
+  }
 
-if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
-  throw new Error("FATAL: JWT Secrets are missing from .env");
+  return value;
 }
 
-export const generateAccessToken = (payload: JwtPayload): string => {
+const JWT_ACCESS_SECRET = requiredEnv("JWT_ACCESS_SECRET");
+const JWT_REFRESH_SECRET = requiredEnv("JWT_REFRESH_SECRET");
+const JWT_ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
+const JWT_REFRESH_EXPIRES_IN_SECONDS = parseInt(process.env.JWT_REFRESH_EXPIRES_IN_SECONDS || "604800", 10);
+
+export const createAccessToken = (payload: AccessTokenPayload): string => {
   return jwt.sign(payload, JWT_ACCESS_SECRET, { expiresIn: JWT_ACCESS_EXPIRES_IN as any });
 };
 
-export const generateRefreshToken = (payload: JwtPayload, res: Response): string => {
-  const token = jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN as any });
-
-  res.cookie("refreshToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: COOKIE_MAX_AGE_MS,
+export const createRefreshToken = (payload: AccessTokenPayload): string => {
+  return jwt.sign(payload, JWT_REFRESH_SECRET, {
+    expiresIn: JWT_REFRESH_EXPIRES_IN_SECONDS,
+    jwtid: crypto.randomUUID(),
   });
-
-  return token;
 };
+
+export function verifyRefreshToken(token: string): AccessTokenPayload {
+  const decoded = jwt.verify(token, JWT_REFRESH_SECRET);
+
+  if (
+    !decoded ||
+    typeof decoded !== "object" ||
+    typeof decoded.sub !== "string" ||
+    typeof decoded.email !== "string" ||
+    typeof decoded.plan !== "string"
+  ) {
+    throw new Error("Invalid refresh token payload");
+  }
+
+  return {
+    sub: decoded.sub,
+    email: decoded.email,
+    plan: decoded.plan as AccessTokenPayload["plan"],
+  };
+}
+
+export const REFRESH_TOKEN_MAX_AGE_MS = JWT_REFRESH_EXPIRES_IN_SECONDS * 1000;
