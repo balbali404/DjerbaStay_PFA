@@ -7,7 +7,7 @@ const accommodations = [
     location: "Sidi Mahrez Beach, Djerba",
     price: "$210",
     rating: "4.9",
-    imageUrl: "/images/home/stay-radisson.svg",
+    imageUrl: "/images/home/stay-radisson.jpg",
     imageAlt: "Luxury resort swimming pool with palm trees in Djerba",
   },
   {
@@ -15,7 +15,7 @@ const accommodations = [
     location: "Erriadh Village, Djerba",
     price: "$145",
     rating: "4.8",
-    imageUrl: "/images/home/stay-dar-dhiafa.svg",
+    imageUrl: "/images/home/stay-dar-dhiafa.jpg",
     imageAlt: "Traditional white stone architecture boutique hotel in Djerba",
   },
   {
@@ -23,7 +23,7 @@ const accommodations = [
     location: "Plage Sidi Mehrez, Djerba",
     price: "$320",
     rating: "5.0",
-    imageUrl: "/images/home/stay-hasdrubal.svg",
+    imageUrl: "/images/home/stay-hasdrubal.jpg",
     imageAlt: "Modern beachfront resort pool with cabanas",
   },
 ];
