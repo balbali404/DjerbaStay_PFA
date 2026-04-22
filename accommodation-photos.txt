@@ -25,6 +25,4 @@ dar-guellala.png
 hotel-amar.png
 palm-beach-club-hotel.png
 dar-lazuli.png
-sangho-club-djerba.png
-hotel-tanit-beach.png
-dar-cherif.png
+robinson-club-djerba-bahiya.png
