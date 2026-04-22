@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import Icon from "@/components/Icon";
@@ -15,10 +16,20 @@ import {
 } from "@/lib/aiClient";
 import { useAuthSession } from "@/lib/authSession";
 import { MAX_DAYS } from "./constants";
-import ResultsPanel from "./components/ResultsPanel";
-import WizardPanel from "./components/WizardPanel";
 import type { PlannerState, ToastMessage, ToastType, TripResult, WizardStep } from "./types";
 import { buildInterests, getErrorMessage } from "./utils";
+
+const ResultsPanel = dynamic(() => import("./components/ResultsPanel"), {
+  loading: () => (
+    <div className="h-[440px] animate-pulse rounded-3xl border border-slate-200 bg-white/70" />
+  ),
+});
+
+const WizardPanel = dynamic(() => import("./components/WizardPanel"), {
+  loading: () => (
+    <div className="h-[440px] animate-pulse rounded-3xl border border-slate-200 bg-white/70" />
+  ),
+});
 
 function createDefaultDate() {
   const tomorrow = new Date();

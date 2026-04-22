@@ -28,15 +28,14 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
   const resolved = use(params);
   const accommodationId = parseInt(resolved.id, 10);
 
+  if (Number.isNaN(accommodationId)) {
+    notFound();
+  }
+
   const [accommodation, setAccommodation] = useState<Accommodation | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (Number.isNaN(accommodationId)) {
-      setLoading(false);
-      return;
-    }
-
     fetchAccommodations()
       .then((data) => {
         const acc = data.find((a) => a.id === accommodationId);
@@ -64,11 +63,11 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
     <main className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <div className="relative w-full h-[50vh] min-h-[400px]">
         <Image
-          src={toLocalImageUrl(accommodation.imageUrl)}
+          src={toLocalImageUrl(accommodation.imageUrl, accommodation.name)}
           alt={accommodation.name}
           fill
           className="object-cover"
-          priority
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8">

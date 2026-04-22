@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import { useAuthSession } from "@/lib/authSession";
 import { fetchCheckoutSessionStatus, ApiError } from "@/lib/backendApi";
@@ -11,7 +11,7 @@ type PaymentStatus = "loading" | "success" | "cancel" | "error";
 const MAX_POLLS = 30;
 const POLL_INTERVAL_MS = 1000;
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { confirmCheckout, reloadUser } = useAuthSession();
@@ -202,5 +202,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="px-6 py-14 text-center text-slate-500">Loading checkout...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }

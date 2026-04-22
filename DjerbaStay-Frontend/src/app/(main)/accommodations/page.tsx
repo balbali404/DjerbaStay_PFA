@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 
 import AccommodationCard from "@/modules/Home/Accommodations/AccommodationCard";
 import Icon from "@/components/Icon";

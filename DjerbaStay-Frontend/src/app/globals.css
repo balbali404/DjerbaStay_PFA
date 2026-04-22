@@ -4,11 +4,21 @@
   --color-primary: #137fec;
   --color-background-light: #f6f7f8;
   --color-background-dark: #101922;
-  --font-display: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-main), "Trebuchet MS", sans-serif;
   --radius: 0.25rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-full: 9999px;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -113,6 +123,19 @@ input[type="range"]::-webkit-slider-runnable-track {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .toast-container {
+    top: 14px;
+    left: 14px;
+    right: 14px;
+  }
+
+  .toast {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .toast {

@@ -29,7 +29,6 @@ export default function Accommodations() {
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedKind, setSelectedKind] = useState<AccommodationFilter>("all");
-  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     fetchAccommodations()
@@ -47,8 +46,8 @@ export default function Accommodations() {
   );
 
   const displayedAccommodations = useMemo(
-    () => (showAll ? filteredAccommodations : filteredAccommodations.slice(0, INITIAL_LIMIT)),
-    [filteredAccommodations, showAll]
+    () => filteredAccommodations.slice(0, INITIAL_LIMIT),
+    [filteredAccommodations]
   );
 
   if (loading) {
@@ -120,7 +119,7 @@ export default function Accommodations() {
             />
           ))}
         </div>
-        {!showAll && filteredAccommodations.length > INITIAL_LIMIT && (
+        {filteredAccommodations.length > INITIAL_LIMIT && (
           <div className="flex justify-center mt-8">
             <Link
               href="/accommodations"
