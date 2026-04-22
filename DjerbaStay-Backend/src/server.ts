@@ -32,6 +32,7 @@ import {
 const app = express();
 
 const PORT = Number(process.env.PORT || 4000);
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "";
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:5000";
 const PASSWORD_SALT_ROUNDS = Number(process.env.PASSWORD_SALT_ROUNDS || 10);
@@ -192,7 +193,13 @@ function buildPublicImageUrl(basePath: string, imageFileName: string | null): st
     return null;
   }
 
-  return `${basePath}/${imageFileName}`;
+  const relativeUrl = `${basePath}/${imageFileName}`;
+
+  if (!PUBLIC_BASE_URL) {
+    return relativeUrl;
+  }
+
+  return `${PUBLIC_BASE_URL}${relativeUrl}`;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {

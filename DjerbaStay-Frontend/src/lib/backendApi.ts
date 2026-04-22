@@ -86,6 +86,7 @@ export type Accommodation = {
   name: string;
   type?: string | null;
   area?: string | null;
+  imageUrl?: string | null;
   latitude: number;
   longitude: number;
   rating?: number | null;
