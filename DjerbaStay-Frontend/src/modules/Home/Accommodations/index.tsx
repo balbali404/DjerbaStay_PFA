@@ -11,19 +11,35 @@ import type { Accommodation } from "@/lib/backendApi";
 type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
 
-const INITIAL_LIMIT = 3;
-
-function toLocalImageUrl(backendUrl: string | null | undefined, name: string): string {
-  if (!backendUrl) return "/images/home/placeholder.svg";
-  const slug = name
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[&']/g, "")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-  return `/images/accommodations/${slug}.png`;
-}
+const accommodations = [
+  {
+    kind: "hotel" as AccommodationKind,
+    name: "Radisson Blu Palace",
+    location: "Sidi Mahrez Beach, Djerba",
+    price: "$210",
+    rating: "4.9",
+    imageUrl: "/images/home/stay-radisson.svg",
+    imageAlt: "Luxury resort swimming pool with palm trees in Djerba",
+  },
+  {
+    kind: "guestHouse" as AccommodationKind,
+    name: "Dar Dhiafa",
+    location: "Erriadh Village, Djerba",
+    price: "$145",
+    rating: "4.8",
+    imageUrl: "/images/home/stay-dar-dhiafa.svg",
+    imageAlt: "Traditional white stone architecture boutique hotel in Djerba",
+  },
+  {
+    kind: "hotel" as AccommodationKind,
+    name: "Hasdrubal Prestige",
+    location: "Plage Sidi Mehrez, Djerba",
+    price: "$320",
+    rating: "5.0",
+    imageUrl: "/images/home/stay-hasdrubal.svg",
+    imageAlt: "Modern beachfront resort pool with cabanas",
+  },
+];
 
 export default function Accommodations() {
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
