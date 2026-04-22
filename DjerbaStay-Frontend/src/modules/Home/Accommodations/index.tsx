@@ -6,6 +6,7 @@ import AccommodationCard from "./AccommodationCard";
 import Icon from "@/components/Icon";
 import { fetchAccommodations } from "@/lib/backendApi";
 import type { Accommodation } from "@/lib/backendApi";
+import Link from "next/link";
 
 type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
@@ -198,7 +199,7 @@ export default function Accommodations() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredAccommodations.map((item) => (
+          {filteredAccommodations.slice(0, 3).map((item) => (
             <AccommodationCard
               key={`${item.id}-${item.name}`}
               id={item.id}
@@ -211,6 +212,18 @@ export default function Accommodations() {
             />
           ))}
         </div>
+
+        {filteredAccommodations.length > 3 && (
+          <div className="text-center mt-8">
+            <Link
+              href="/accommodations"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all"
+            >
+              View All {filteredAccommodations.length} Accommodations
+              <Icon name="arrow_forward" className="size-5" />
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
