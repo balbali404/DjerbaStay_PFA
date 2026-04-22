@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
@@ -16,6 +17,14 @@ function toLocalImageUrl(backendUrl: string | null | undefined): string {
   if (!backendUrl) return "/images/home/placeholder.svg";
   const filename = backendUrl.split("/").pop();
   return `/images/accommodations/${filename}`;
+}
+
+function getAccommodationMapUrl(accommodation: Accommodation): string {
+  if (accommodation.id === 31) {
+    return "https://maps.app.goo.gl/pnPXF5HBUJ8tjSqz7";
+  }
+
+  return `https://www.google.com/maps/search/?api=1&query=${accommodation.latitude},${accommodation.longitude}`;
 }
 
 export default function AccommodationPage({ params }: AccommodationPageProps) {
@@ -119,10 +128,18 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
               <div className="aspect-video w-full rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
                 <div className="text-center text-slate-400">
                   <Icon name="map" className="size-12 mx-auto mb-2" />
-                  <p>Map view coming soon</p>
+                  <p>Open this stay in Google Maps</p>
                   <p className="text-sm">
                     {accommodation.latitude}, {accommodation.longitude}
                   </p>
+                  <Link
+                    href={getAccommodationMapUrl(accommodation)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary/90"
+                  >
+                    View on Google Maps
+                  </Link>
                 </div>
               </div>
             </div>

@@ -28,3 +28,4 @@ dar-lazuli.png
 sangho-club-djerba.png
 hotel-tanit-beach.png
 dar-cherif.png
+robinson-club-djerba-bahiya.png
