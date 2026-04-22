@@ -80,12 +80,12 @@ export default function HowItWorks() {
               <Icon name="smart_toy" className="size-5" />
               Powered by Machine Learning
             </h4>
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-slate-100 leading-tight">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
               Stay Planning, <br />
               <span className="text-primary">Evolved.</span>
             </h2>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
+          <p className="text-slate-600 text-lg leading-relaxed">
             Our recommendation engine now highlights the best saved ML result from real planner runs,
             so visitors can see what the model is producing in production.
           </p>
@@ -95,7 +95,7 @@ export default function HowItWorks() {
                 <Icon name="psychology" className="size-5 text-primary" />
               </div>
               <div>
-                <h5 className="font-bold text-slate-900 dark:text-slate-100">Recommendation Engine</h5>
+                <h5 className="font-bold text-slate-900">Recommendation Engine</h5>
                 <p className="text-slate-500 text-sm">
                   ML results are saved to the database and ranked by confidence.
                 </p>
@@ -106,7 +106,7 @@ export default function HowItWorks() {
                 <Icon name="magic_button" className="size-5 text-primary" />
               </div>
               <div>
-                <h5 className="font-bold text-slate-900 dark:text-slate-100">Best Result Live Preview</h5>
+                <h5 className="font-bold text-slate-900">Best Result Live Preview</h5>
                 <p className="text-slate-500 text-sm">
                   The card on the right updates from saved planner output.
                 </p>
@@ -116,9 +116,9 @@ export default function HowItWorks() {
         </div>
 
         <div className="lg:w-1/2 relative">
-          <div className="relative z-10 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-primary/20">
+          <div className="relative z-10 bg-white p-8 rounded-3xl shadow-2xl border border-primary/20">
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <span className="font-bold">Recommendation Engine</span>
                 <Icon name="more_horiz" className="size-5 text-primary" />
               </div>
@@ -127,20 +127,20 @@ export default function HowItWorks() {
                 <div className="size-10 rounded-full bg-primary/20 flex items-center justify-center">
                   <Icon name="bolt" className="size-4 text-primary" />
                 </div>
-                <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${matchPercent}%` }}></div>
                 </div>
                 <span className="text-xs font-bold text-primary">{matchPercent}% Match</span>
               </div>
 
-              <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 p-4 space-y-3">
+              <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
                 {isLoadingRecommendation ? (
                   <p className="text-sm text-slate-500">Loading best saved ML result...</p>
                 ) : bestRecommendation ? (
                   <>
                     <div>
                       <p className="text-xs uppercase tracking-wide text-slate-500">Best Result</p>
-                      <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                      <p className="text-lg font-bold text-slate-900">
                         {bestRecommendation.accommodation.name}
                       </p>
                       <p className="text-sm text-slate-500">
@@ -164,7 +164,7 @@ export default function HowItWorks() {
                     </div>
 
                     <p className="text-xs text-slate-500">
-                      Budget estimate: <span className="font-semibold text-slate-700 dark:text-slate-200">{formatBudget(bestRecommendation.estimatedTotalCost)}</span> · Saved {formatDateLabel(bestRecommendation.createdAt)}
+                      Budget estimate: <span className="font-semibold text-slate-700">{formatBudget(bestRecommendation.estimatedTotalCost)}</span> · Saved {formatDateLabel(bestRecommendation.createdAt)}
                     </p>
                   </>
                 ) : (
@@ -175,7 +175,7 @@ export default function HowItWorks() {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="aspect-square rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-primary relative overflow-hidden">
+                <div className="aspect-square rounded-xl bg-slate-100 border-2 border-primary relative overflow-hidden">
                   <Image
                     src="/images/home/how-ml-1.svg"
                     alt="Preference analysis"
@@ -184,7 +184,7 @@ export default function HowItWorks() {
                     sizes="(max-width: 1024px) 50vw, 20vw"
                   />
                 </div>
-                <div className="aspect-square rounded-xl bg-slate-100 dark:bg-slate-800 opacity-70 relative overflow-hidden">
+                <div className="aspect-square rounded-xl bg-slate-100 opacity-70 relative overflow-hidden">
                   <Image
                     src="/images/home/how-ml-2.svg"
                     alt="Activity clusters"

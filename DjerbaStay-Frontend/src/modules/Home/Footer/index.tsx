@@ -4,23 +4,23 @@ import Icon from "@/components/Icon";
 
 export default function Footer() {
   return (
-    <footer className="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900 px-6 lg:px-20 py-12">
+    <footer className="bg-white border-t border-slate-100 px-6 lg:px-20 py-12">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-primary">
             <Icon name="holiday_village" className="size-5" />
-            <h2 className="text-slate-900 dark:text-slate-100 text-xl font-extrabold">
+            <h2 className="text-slate-900 text-xl font-extrabold">
               DjerbaStay
             </h2>
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+          <p className="text-slate-500 text-sm leading-relaxed">
             Your intelligent companion for exploring the magical island of
             Djerba, Tunisia.
           </p>
         </div>
         <div>
           <h4 className="font-bold mb-6">Quick Links</h4>
-          <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+          <ul className="space-y-4 text-sm text-slate-500">
             <li>
               <Link className="hover:text-primary transition-colors" href="#">
                 Discover Hotels
@@ -45,7 +45,7 @@ export default function Footer() {
         </div>
         <div>
           <h4 className="font-bold mb-6">Support</h4>
-          <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+          <ul className="space-y-4 text-sm text-slate-500">
             <li>
               <Link className="hover:text-primary transition-colors" href="#">
                 Help Center
@@ -72,19 +72,19 @@ export default function Footer() {
           <h4 className="font-bold mb-6">Connect</h4>
           <div className="flex gap-4">
             <Link
-              className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
+              className="size-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
               href="#"
             >
               <Icon name="public" className="size-4" />
             </Link>
             <Link
-              className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
+              className="size-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
               href="#"
             >
               <Icon name="camera_alt" className="size-4" />
             </Link>
             <Link
-              className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
+              className="size-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
               href="#"
             >
               <Icon name="alternate_email" className="size-4" />

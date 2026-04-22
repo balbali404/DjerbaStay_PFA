@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import AccommodationCard from "./AccommodationCard";
 import Icon from "@/components/Icon";
@@ -10,9 +10,21 @@ import type { Accommodation } from "@/lib/backendApi";
 type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
 
-const accommodations = [
+type AccommodationCardItem = {
+  id: number;
+  name: string;
+  location: string;
+  price: string;
+  rating: string;
+  imageUrl: string;
+  imageAlt: string;
+  kind: AccommodationKind;
+};
+
+const FALLBACK_ACCOMMODATIONS: AccommodationCardItem[] = [
   {
-    kind: "hotel" as AccommodationKind,
+    id: 1,
+    kind: "hotel",
     name: "Radisson Blu Palace",
     location: "Sidi Mahrez Beach, Djerba",
     price: "$210",
@@ -21,7 +33,8 @@ const accommodations = [
     imageAlt: "Luxury resort swimming pool with palm trees in Djerba",
   },
   {
-    kind: "guestHouse" as AccommodationKind,
+    id: 2,
+    kind: "maison",
     name: "Dar Dhiafa",
     location: "Erriadh Village, Djerba",
     price: "$145",
@@ -30,7 +43,8 @@ const accommodations = [
     imageAlt: "Traditional white stone architecture boutique hotel in Djerba",
   },
   {
-    kind: "hotel" as AccommodationKind,
+    id: 3,
+    kind: "hotel",
     name: "Hasdrubal Prestige",
     location: "Plage Sidi Mehrez, Djerba",
     price: "$320",
@@ -40,87 +54,98 @@ const accommodations = [
   },
 ];
 
+const PRICE_BY_KIND: Record<AccommodationKind, string> = {
+  hotel: "$180",
+  maison: "$130",
+  local: "$95",
+};
+
+function normalizeKind(value?: string | null): AccommodationKind {
+  const normalized = (value || "").trim().toLowerCase();
+  if (normalized === "hotel" || normalized === "maison" || normalized === "local") {
+    return normalized;
+  }
+
+  return "hotel";
+}
+
+function toCardItem(item: Accommodation): AccommodationCardItem {
+  const kind = normalizeKind(item.type);
+  const fallbackImageByKind: Record<AccommodationKind, string> = {
+    hotel: "/images/home/stay-radisson.jpg",
+    maison: "/images/home/stay-dar-dhiafa.jpg",
+    local: "/images/home/stay-hasdrubal.jpg",
+  };
+
+  return {
+    id: item.id,
+    kind,
+    name: item.name,
+    location: item.area || "Djerba, Tunisia",
+    price: PRICE_BY_KIND[kind],
+    rating: String(item.rating ?? "4.5"),
+    imageUrl: item.imageUrl || fallbackImageByKind[kind],
+    imageAlt: `${item.name} in Djerba`,
+  };
+}
+
 export default function Accommodations() {
-  const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
+  const [accommodations, setAccommodations] = useState<AccommodationCardItem[]>(
+    FALLBACK_ACCOMMODATIONS
+  );
   const [loading, setLoading] = useState(true);
   const [selectedKind, setSelectedKind] = useState<AccommodationFilter>("all");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadAccommodations() {
+      try {
+        const fetched = await fetchAccommodations();
+        if (!isMounted || fetched.length === 0) {
+          return;
+        }
+
+        setAccommodations(fetched.map(toCardItem));
+      } catch {
+        // Keep fallback cards if API is unavailable.
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadAccommodations();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const filteredAccommodations = useMemo(
     () =>
       selectedKind === "all"
         ? accommodations
-        : accommodations.filter((item) => (item.type || "hotel") === selectedKind),
+        : accommodations.filter((item) => item.kind === selectedKind),
     [accommodations, selectedKind]
-  );
-
-  const updateArrowState = useCallback(() => {
-    const container = carouselRef.current;
-
-    if (!container) return;
-
-    const maxScrollLeft = container.scrollWidth - container.clientWidth;
-    setCanScrollLeft(container.scrollLeft > 2);
-    setCanScrollRight(container.scrollLeft < maxScrollLeft - 2);
-  }, []);
-
-  const slideByOneCard = useCallback((direction: "left" | "right") => {
-    const container = carouselRef.current;
-
-    if (!container) return;
-
-    const firstCard = container.querySelector<HTMLElement>(
-      "[data-accommodation-card]"
-    );
-    const computedStyles = window.getComputedStyle(container);
-    const gap = Number.parseFloat(computedStyles.columnGap || computedStyles.gap || "0");
-    const cardWidth = firstCard?.getBoundingClientRect().width ?? container.clientWidth * 0.85;
-    const offset = cardWidth + gap;
-
-    container.scrollBy({
-      left: direction === "right" ? offset : -offset,
-      behavior: "smooth",
-    });
-  }, []);
-
-  useEffect(() => {
-    const container = carouselRef.current;
-
-    if (!container) return;
-
-    const syncArrowState = () => updateArrowState();
-
-    syncArrowState();
-    container.addEventListener("scroll", syncArrowState, { passive: true });
-    window.addEventListener("resize", syncArrowState);
-
-    return () => {
-      container.removeEventListener("scroll", syncArrowState);
-      window.removeEventListener("resize", syncArrowState);
-    };
-  }, [filteredAccommodations, updateArrowState]);
-
-  useEffect(() => {
-    const container = carouselRef.current;
-
-    if (!container) return;
-
-    container.scrollTo({ left: 0, behavior: "smooth" });
-    updateArrowState();
-  }, [selectedKind, updateArrowState]);
-
-  const displayedAccommodations = useMemo(
-    () => filteredAccommodations.slice(0, INITIAL_LIMIT),
-    [filteredAccommodations]
   );
 
   if (loading) {
     return (
-      <section className="py-16 bg-slate-50 dark:bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center py-20">
             <Icon name="loading" className="size-8 animate-spin text-primary" />
           </div>
         </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-16 bg-white">
+      <div className="container mx-auto px-4 space-y-8">
         <div className="flex gap-4 mt-6 md:mt-0">
           <button
             onClick={() => setSelectedKind("all")}
@@ -147,23 +172,45 @@ export default function Accommodations() {
             Hotels
           </button>
           <button
-            onClick={() => setSelectedKind("guestHouse")}
+            onClick={() => setSelectedKind("maison")}
             className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold transition-all ${
-              selectedKind === "guestHouse"
+              selectedKind === "maison"
                 ? "bg-primary text-white shadow-md"
                 : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary"
             }`}
-            aria-pressed={selectedKind === "guestHouse"}
+            aria-pressed={selectedKind === "maison"}
           >
             <Icon name="home" className="size-5" />
-            Guest Houses
+            Maison
+          </button>
+          <button
+            onClick={() => setSelectedKind("local")}
+            className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold transition-all ${
+              selectedKind === "local"
+                ? "bg-primary text-white shadow-md"
+                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary"
+            }`}
+            aria-pressed={selectedKind === "local"}
+          >
+            <Icon name="apartment" className="size-5" />
+            Local
           </button>
         </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
-        {filteredAccommodations.map((item) => (
-          <AccommodationCard key={item.name} {...item} />
-        ))}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredAccommodations.map((item) => (
+            <AccommodationCard
+              key={`${item.id}-${item.name}`}
+              id={item.id}
+              name={item.name}
+              location={item.location}
+              price={item.price}
+              rating={item.rating}
+              imageUrl={item.imageUrl}
+              imageAlt={item.imageAlt}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

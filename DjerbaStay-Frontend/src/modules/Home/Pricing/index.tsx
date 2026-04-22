@@ -122,7 +122,7 @@ export default function PricingSection() {
     <section id="pricing" className="px-4 lg:px-20 py-20">
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <h2 className="text-4xl font-black text-slate-900 dark:text-slate-100">
+          <h2 className="text-4xl font-black text-slate-900">
             Choose Your Plan
           </h2>
           <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">

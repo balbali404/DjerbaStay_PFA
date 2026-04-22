@@ -14,6 +14,15 @@ interface AccommodationPageProps {
 }
 
 function toLocalImageUrl(backendUrl: string | null | undefined, name: string): string {
+  if (backendUrl && !backendUrl.includes("localhost:4000")) {
+    return backendUrl;
+  }
+  if (backendUrl) {
+    const fileName = backendUrl.split("/").pop();
+    if (fileName) {
+      return `/images/accommodations/${fileName}`;
+    }
+  }
   if (!backendUrl) return "/images/home/placeholder.svg";
   const slug = name
     .toLowerCase()
@@ -69,7 +78,7 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <main className="min-h-screen bg-slate-50">
       <div className="relative w-full h-[50vh] min-h-[400px]">
         <Image
           src={toLocalImageUrl(accommodation.imageUrl, accommodation.name)}
@@ -101,9 +110,9 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 flex flex-col gap-8">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
               <h2 className="text-2xl font-bold mb-4">About</h2>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-slate-600">
                 Experience ultimate relaxation at {accommodation.name}, a premier{" "}
                 {accommodation.type === "hotel" ? "hotel" : "accommodation"} in{" "}
                 {accommodation.area || "Djerba"}. With exceptional amenities and
@@ -111,14 +120,14 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
               <h2 className="text-2xl font-bold mb-4">Amenities</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {["Pool", "WiFi", "Restaurant", "Spa", "Gym", "Parking"].map(
                   (amenity) => (
                     <div
                       key={amenity}
-                      className="flex items-center gap-2 text-slate-600 dark:text-slate-400"
+                      className="flex items-center gap-2 text-slate-600"
                     >
                       <Icon name="check_circle" className="size-5 text-primary" />
                       <span>{amenity}</span>
@@ -128,9 +137,9 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
               <h2 className="text-2xl font-bold mb-4">Location</h2>
-              <div className="aspect-video w-full rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+              <div className="aspect-video w-full rounded-xl bg-slate-100 flex items-center justify-center">
                 <div className="text-center text-slate-400">
                   <Icon name="map" className="size-12 mx-auto mb-2" />
                   <p>Open this stay in Google Maps</p>
@@ -151,7 +160,7 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm sticky top-8">
+            <div className="bg-white rounded-2xl p-8 shadow-sm sticky top-8">
               <div className="flex flex-col gap-4">
                 <div>
                   <span className="text-slate-400">Starting from</span>

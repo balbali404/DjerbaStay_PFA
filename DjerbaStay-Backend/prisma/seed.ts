@@ -24,13 +24,14 @@ const prisma = new PrismaClient({
 });
 
 type AccommodationCsvRow = {
-  id: string;
+  hotel_id: string;
   name: string;
   type: string;
   area: string;
   latitude: string;
   longitude: string;
   rating: string;
+  price_euro: string;
 };
 
 type PlaceCsvRow = {
@@ -243,12 +244,42 @@ async function seedAccommodations(): Promise<void> {
   const accommodationsCsvPath = resolveRootPath(
     "DjerbaStay-Ai",
     "data",
-    "accommodations_djerba.csv"
+    "accommodations_djerba_real.csv"
   );
   const rows = await readCsvRows<AccommodationCsvRow>(accommodationsCsvPath);
 
+  const imageFileNameMap: Record<string, string> = {
+    "3792395": "caribbean-world-djerba.jpg",
+    "4045883": "djerba_castille.jpg",
+    "758612": "djerba_holiday_beach_.jpg",
+    "3044172": "El Mouradi Djerba Menzel.png",
+    "45967004": "Dar Dhiafa.png",
+    "3030736": "Mövenpick Resort & Marine Spa.png",
+    "2114393": "radisson-blu-palace-resort-thalasso.png",
+    "3450150": "hasdrabal prestige.png",
+    "758611": "robinson-club-djerba-bahiya.png",
+    "3068045": "Seabel Rym Beach.png",
+    "22085477": "Fiesta Beach Club Hotel.png",
+    "9031498": "dar jerba hotel .png",
+    "22869991": "Yadis Djerba Golf & Spa.png",
+    "2195460": "djerba plaza.png",
+    "17507971": "Fiesta Beach Club Hotel.png",
+    "3911319": "Dar Dhiafa.png",
+    "79030558": "four-seasons-djerba.jpg",
+    "10675958": "four-seasons-djerba.jpg",
+    "5599972": "four-seasons-djerba.jpg",
+    "3073554": "hasdrabal prestige.png",
+    "7093029": "four-seasons-djerba.jpg",
+    "123998102": "four-seasons-djerba.jpg",
+    "3066572": "four-seasons-djerba.jpg",
+    "2256147": "four-seasons-djerba.jpg",
+  };
+
   for (const row of rows) {
-    const externalId = parseNumber(row.id);
+    const externalId = parseNumber(row.hotel_id);
+    const imageFileName =
+      imageFileNameMap[String(externalId)] ||
+      buildImageFileName("accommodation", externalId, row.name);
 
     await prisma.accommodation.upsert({
       where: {
@@ -258,20 +289,22 @@ async function seedAccommodations(): Promise<void> {
         name: row.name,
         type: parseOptionalString(row.type),
         area: parseOptionalString(row.area),
-        imageFileName: buildImageFileName("accommodation", externalId, row.name),
+        imageFileName: imageFileName,
         latitude: parseNumber(row.latitude),
         longitude: parseNumber(row.longitude),
         rating: parseOptionalNumber(row.rating),
+        priceEuro: parseOptionalNumber(row.price_euro),
       },
       create: {
         externalId,
         name: row.name,
         type: parseOptionalString(row.type),
         area: parseOptionalString(row.area),
-        imageFileName: buildImageFileName("accommodation", externalId, row.name),
+        imageFileName: imageFileName,
         latitude: parseNumber(row.latitude),
         longitude: parseNumber(row.longitude),
         rating: parseOptionalNumber(row.rating),
+        priceEuro: parseOptionalNumber(row.price_euro),
       },
     });
   }

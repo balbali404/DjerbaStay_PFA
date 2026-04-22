@@ -24,9 +24,9 @@ export default function AccommodationCard({
 }: AccommodationCardProps) {
   return (
     <Link href={`/accommodations/${id}`}>
-      <div className="group flex flex-col gap-4 rounded-2xl bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-800 cursor-pointer">
+      <div className="group flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 cursor-pointer">
         <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl">
-          <div className="absolute top-3 right-3 z-10 bg-white/90 dark:bg-slate-900/90 p-2 rounded-full text-primary shadow-md">
+          <div className="absolute top-3 right-3 z-10 bg-white/90 p-2 rounded-full text-primary shadow-md">
             <Icon name="favorite" className="size-4" />
           </div>
           <Image
@@ -39,7 +39,7 @@ export default function AccommodationCard({
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <h3 className="text-slate-900 dark:text-slate-100 text-xl font-bold">
+            <h3 className="text-slate-900 text-xl font-bold">
               {name}
             </h3>
             <div className="flex items-center gap-1 text-amber-500">
@@ -47,11 +47,11 @@ export default function AccommodationCard({
               <span className="text-sm font-bold">{rating}</span>
             </div>
           </div>
-          <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1 text-sm">
+          <p className="text-slate-500 flex items-center gap-1 text-sm">
             <Icon name="location_on" className="size-4" />
             {location}
           </p>
-          <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
             <div className="flex flex-col">
               <span className="text-xs text-slate-400">Starting from</span>
               <span className="text-lg font-bold text-primary">{price}</span>

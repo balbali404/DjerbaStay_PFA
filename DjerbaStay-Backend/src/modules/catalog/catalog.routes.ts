@@ -5,9 +5,9 @@ import prisma from "../../config/prisma";
 
 const router = Router();
 
-const ACCOMMODATION_IMAGE_BASE_PATH = "/public/images/accommodations";
-const PLACE_IMAGE_BASE_PATH = "/public/images/places";
-const RESTAURANT_IMAGE_BASE_PATH = "/public/images/restaurants";
+const ACCOMMODATION_IMAGE_BASE_PATH = "/images/accommodations";
+const PLACE_IMAGE_BASE_PATH = "/images/places";
+const RESTAURANT_IMAGE_BASE_PATH = "/images/restaurants";
 
 function buildPublicImageUrl(basePath: string, imageFileName: string | null): string | null {
   if (!imageFileName) {

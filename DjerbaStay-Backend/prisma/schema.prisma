@@ -78,8 +78,9 @@ model Accommodation {
   area            String?
   imageFileName   String?
   latitude        Float
-  longitude       Float
-  rating          Float?
+  longitude      Float
+  rating         Float?
+  priceEuro      Float?
   plannerRequests PlannerRequest[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt

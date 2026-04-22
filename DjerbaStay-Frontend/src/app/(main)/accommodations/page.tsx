@@ -11,6 +11,15 @@ type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
 
 function toLocalImageUrl(backendUrl: string | null | undefined, name: string): string {
+  if (backendUrl && !backendUrl.includes("localhost:4000")) {
+    return backendUrl;
+  }
+  if (backendUrl) {
+    const fileName = backendUrl.split("/").pop();
+    if (fileName) {
+      return `/images/accommodations/${fileName}`;
+    }
+  }
   if (!backendUrl) return "/images/home/placeholder.svg";
   const slug = name
     .toLowerCase()
@@ -51,7 +60,7 @@ export default function AccommodationsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-900 py-16">
+    <main className="min-h-screen bg-white py-16">
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-8">
           <h1 className="text-4xl font-bold">All Accommodations</h1>
@@ -62,7 +71,7 @@ export default function AccommodationsPage() {
               className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all ${
                 selectedKind === "all"
                   ? "bg-primary text-white"
-                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10"
+                  : "bg-white text-slate-600 hover:bg-primary/10"
               }`}
             >
               <Icon name="apartment" className="size-5" />
@@ -73,7 +82,7 @@ export default function AccommodationsPage() {
               className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all ${
                 selectedKind === "hotel"
                   ? "bg-primary text-white"
-                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10"
+                  : "bg-white text-slate-600 hover:bg-primary/10"
               }`}
             >
               <Icon name="apartment" className="size-5" />
@@ -84,7 +93,7 @@ export default function AccommodationsPage() {
               className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all ${
                 selectedKind === "maison"
                   ? "bg-primary text-white"
-                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10"
+                  : "bg-white text-slate-600 hover:bg-primary/10"
               }`}
             >
               <Icon name="home" className="size-5" />
@@ -95,7 +104,7 @@ export default function AccommodationsPage() {
               className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all ${
                 selectedKind === "local"
                   ? "bg-primary text-white"
-                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10"
+                  : "bg-white text-slate-600 hover:bg-primary/10"
               }`}
             >
               <Icon name="place" className="size-5" />
