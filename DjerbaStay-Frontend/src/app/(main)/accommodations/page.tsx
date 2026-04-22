@@ -11,10 +11,16 @@ import type { Accommodation } from "@/lib/backendApi";
 type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
 
-function toLocalImageUrl(backendUrl: string | null | undefined): string {
+function toLocalImageUrl(backendUrl: string | null | undefined, name: string): string {
   if (!backendUrl) return "/images/home/placeholder.svg";
-  const filename = backendUrl.split("/").pop();
-  return `/images/accommodations/${filename}`;
+  const slug = name
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[&']/g, "")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return `/images/accommodations/${slug}.png`;
 }
 
 export default function AccommodationsPage() {
@@ -108,7 +114,7 @@ export default function AccommodationsPage() {
               location={item.area || "Djerba"}
               price="$150"
               rating={item.rating?.toString() || "4.0"}
-              imageUrl={toLocalImageUrl(item.imageUrl)}
+              imageUrl={toLocalImageUrl(item.imageUrl, item.name)}
               imageAlt={item.name}
             />
           ))}

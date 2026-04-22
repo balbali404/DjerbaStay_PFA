@@ -12,10 +12,16 @@ interface AccommodationPageProps {
   params: Promise<{ id: string }>;
 }
 
-function toLocalImageUrl(backendUrl: string | null | undefined): string {
+function toLocalImageUrl(backendUrl: string | null | undefined, name: string): string {
   if (!backendUrl) return "/images/home/placeholder.svg";
-  const filename = backendUrl.split("/").pop();
-  return `/images/accommodations/${filename}`;
+  const slug = name
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[&']/g, "")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return `/images/accommodations/${slug}.png`;
 }
 
 export default function AccommodationPage({ params }: AccommodationPageProps) {
