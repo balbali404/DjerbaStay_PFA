@@ -126,8 +126,17 @@ function slugify(value: string): string {
 }
 
 function buildImageFileName(prefix: string, externalId: number, label: string): string {
-  const slug = slugify(label) || "item";
-  return `${prefix}-${externalId}-${slug}.jpg`;
+  if (prefix === "accommodation") {
+    const slug = label
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[&']/g, "")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+    return `${slug}.png`;
+  }
+  return `${prefix}-${externalId}-${label.toLowerCase().replace(/\s+/g, "-")}.jpg`;
 }
 
 function parseTransportMode(rawTransport: string): TransportMode {

@@ -1,8 +1,18 @@
+import dynamic from "next/dynamic";
+
 import Icon from "@/components/Icon";
 import { transportLabels } from "../constants";
 import type { PlannerState, TripResult } from "../types";
 import { classNames, formatPrice, formatTripPeriod } from "../utils";
-import TripMap from "./TripMap";
+
+const TripMap = dynamic(() => import("./TripMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[520px] items-center justify-center bg-slate-100 text-slate-400">
+      Loading map...
+    </div>
+  ),
+});
 
 type ResultsPanelProps = {
   results: TripResult;

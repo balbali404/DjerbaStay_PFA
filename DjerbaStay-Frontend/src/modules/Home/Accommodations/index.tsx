@@ -1,11 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import AccommodationCard from "./AccommodationCard";
 import Icon from "@/components/Icon";
+import { fetchAccommodations } from "@/lib/backendApi";
+import type { Accommodation } from "@/lib/backendApi";
 
-type AccommodationKind = "hotel" | "guestHouse";
+type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
 
 const accommodations = [
@@ -15,7 +17,7 @@ const accommodations = [
     location: "Sidi Mahrez Beach, Djerba",
     price: "$210",
     rating: "4.9",
-    imageUrl: "/images/home/stay_radisson.jpg",
+    imageUrl: "/images/home/stay-radisson.jpg",
     imageAlt: "Luxury resort swimming pool with palm trees in Djerba",
   },
   {
@@ -36,56 +38,19 @@ const accommodations = [
     imageUrl: "/images/home/stay-hasdrubal.jpg",
     imageAlt: "Modern beachfront resort pool with cabanas",
   },
-  {
-    kind: "hotel" as AccommodationKind,
-    name: "Djerba Castille",
-    location: "Djerba",
-    price: "$316",
-    rating: "4.0",
-    imageUrl: "/images/home/djerba_castille.jpg",
-    imageAlt: "Modern beachfront resort pool with cabanas",
-  },
-  {
-    kind: "hotel" as AccommodationKind,
-    name: "The Four Seasons Hotel Djerba",
-    location: "Djerba",
-    price: "$525",
-    rating: "4.0",
-    imageUrl: "/images/home/four-seasons-djerba.jpg",
-    imageAlt: "Modern beachfront resort pool with cabanas",
-  },
-  {
-    kind: "hotel" as AccommodationKind,
-    name: "Djerba Holiday Beach",
-    location: "Djerba",
-    price: "$414",
-    rating: "4.0",
-    imageUrl: "/images/home/djerba_holiday_beach_.jpg",
-    imageAlt: "Modern beachfront resort pool with cabanas",
-  },
-  {
-    kind: "hotel" as AccommodationKind,
-    name: "Caribbean World Djerba",
-    location: "Djerba",
-    price: "$price to fix",
-    rating: "4.0",
-    imageUrl: "/images/home/caribbean-world-djerba.jpg",
-    imageAlt: "Modern beachfront resort pool with cabanas",
-  },
 ];
 
 export default function Accommodations() {
+  const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedKind, setSelectedKind] = useState<AccommodationFilter>("all");
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   const filteredAccommodations = useMemo(
     () =>
       selectedKind === "all"
         ? accommodations
-        : accommodations.filter((item) => item.kind === selectedKind),
-    [selectedKind]
+        : accommodations.filter((item) => (item.type || "hotel") === selectedKind),
+    [accommodations, selectedKind]
   );
 
   const updateArrowState = useCallback(() => {
@@ -143,16 +108,18 @@ export default function Accommodations() {
     updateArrowState();
   }, [selectedKind, updateArrowState]);
 
-  return (
-    <div className="px-4 lg:px-20 py-16 traditional-pattern">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 px-4">
-        <div>
-          <h2 className="text-slate-900 dark:text-slate-100 text-3xl md:text-4xl font-extrabold tracking-tight">
-            Handpicked Accommodations
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">
-            Authentic stays curated for your comfort
-          </p>
+  const displayedAccommodations = useMemo(
+    () => filteredAccommodations.slice(0, INITIAL_LIMIT),
+    [filteredAccommodations]
+  );
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-slate-50 dark:bg-slate-900">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center py-20">
+            <Icon name="loading" className="size-8 animate-spin text-primary" />
+          </div>
         </div>
         <div className="flex gap-4 mt-6 md:mt-0">
           <button
@@ -193,42 +160,11 @@ export default function Accommodations() {
           </button>
         </div>
       </div>
-      <div className="relative px-4">
-        <button
-          type="button"
-          onClick={() => slideByOneCard("left")}
-          disabled={!canScrollLeft}
-          className="absolute left-1 top-1/2 z-10 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 text-slate-700 dark:text-slate-200 shadow-lg transition hover:bg-white dark:hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
-          aria-label="Show previous accommodations"
-        >
-          <Icon name="chevron_left" className="size-6" />
-        </button>
-
-        <div
-          ref={carouselRef}
-          className="flex gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory px-14 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {filteredAccommodations.map((item) => (
-            <div
-              key={item.name}
-              data-accommodation-card
-              className="min-w-[280px] sm:min-w-[360px] lg:min-w-[380px] snap-start shrink-0"
-            >
-              <AccommodationCard {...item} />
-            </div>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => slideByOneCard("right")}
-          disabled={!canScrollRight}
-          className="absolute right-1 top-1/2 z-10 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 text-slate-700 dark:text-slate-200 shadow-lg transition hover:bg-white dark:hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
-          aria-label="Show more accommodations"
-        >
-          <Icon name="chevron_right" className="size-6" />
-        </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+        {filteredAccommodations.map((item) => (
+          <AccommodationCard key={item.name} {...item} />
+        ))}
       </div>
-    </div>
+    </section>
   );
 }

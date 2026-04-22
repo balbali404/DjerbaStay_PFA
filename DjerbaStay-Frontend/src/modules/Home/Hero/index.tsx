@@ -28,8 +28,8 @@ export default function Hero() {
   }, []);
 
   return (
-    <div className="relative px-4 lg:px-20 py-8">
-      <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-slate-900 min-h-[600px]">
+    <div className="relative px-4 py-6 sm:px-6 sm:py-8 lg:px-20">
+      <div className="relative min-h-[500px] overflow-hidden rounded-3xl bg-slate-900 shadow-2xl md:min-h-[620px]">
         {/* Loading Spinner */}
         {!isVideoLoaded && (
           <div className="absolute inset-0 z-0 flex items-center justify-center bg-slate-900">
@@ -51,29 +51,29 @@ export default function Hero() {
           {isIntersecting && <source src="/djerba2.mp4" type="video/mp4" />}
         </video>
         <div className="absolute inset-0 bg-black/40 z-0"></div>
-        <div className="flex min-h-[600px] flex-col gap-6 items-center justify-center p-8 text-center relative z-10">
+        <div className="relative z-10 flex min-h-[500px] flex-col items-center justify-center gap-6 p-6 text-center md:min-h-[620px] md:p-8">
           <div className="max-w-3xl flex flex-col gap-6 z-10">
             <span className="bg-primary/30 backdrop-blur-md text-white text-xs font-bold uppercase tracking-widest py-1 px-4 rounded-full self-center">
               Welcome to the Island of Dreams
             </span>
-            <h1 className="text-white text-5xl md:text-7xl font-black leading-tight tracking-tight">
+            <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl md:text-7xl">
               Discover Your Perfect
               <span className="text-primary-200"> Djerba Stay</span>
             </h1>
-            <p className="text-white/90 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+            <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-white/90 sm:text-lg md:text-xl">
               Experience the magic of Tunisia&apos;s hidden gem with personalized,
               ML-powered recommendations tailored to your unique travel style.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
+            <div className="mt-4 flex flex-col justify-center gap-4 sm:flex-row">
               <Link
                 href="/planner"
-                className="flex min-w-[200px] cursor-pointer items-center justify-center rounded-xl h-14 px-8 bg-primary text-white text-lg font-bold shadow-xl hover:scale-105 transition-transform"
+                className="flex h-14 min-w-[220px] cursor-pointer items-center justify-center rounded-xl bg-primary px-8 text-lg font-bold text-white shadow-xl transition-transform hover:scale-105"
               >
                 Find My Dream Stay
               </Link>
               <Link
                 href="/planner"
-                className="flex min-w-[200px] cursor-pointer items-center justify-center rounded-xl h-14 px-8 bg-white/10 backdrop-blur-md border border-white/30 text-white text-lg font-bold hover:bg-white/20 transition-all"
+                className="flex h-14 min-w-[220px] cursor-pointer items-center justify-center rounded-xl border border-white/30 bg-white/10 px-8 text-lg font-bold text-white backdrop-blur-md transition-all hover:bg-white/20"
               >
                 Explore Planner
               </Link>
