@@ -1,0 +1,31 @@
+id,name,type,area,latitude,longitude,rating,estimated_price_tnd,estimated_price_low_tnd,estimated_price_high_tnd,price_source
+1,Radisson Blu Palace Resort & Thalasso,hotel,Zone Touristique,33.8685,10.9215,4.0,215,172,258,estimated_from_type_and_rating
+2,Hasdrubal Prestige Thalassa & Spa,hotel,Zone Touristique,33.8720,10.9285,4.1,220,176,264,estimated_from_type_and_rating
+3,Djerba Plaza Hotel & Spa,hotel,Zone Touristique,33.8655,10.9175,3.8,205,164,246,estimated_from_type_and_rating
+4,Seabel Rym Beach,hotel,Aghir,33.8315,10.8945,4.4,240,192,288,estimated_from_type_and_rating
+5,Yadis Djerba Golf & Spa,hotel,Midoun,33.8540,10.9065,3.8,205,164,246,estimated_from_type_and_rating
+6,Dar Dhiafa,maison,Erriadh,33.8125,10.8595,4.6,185,148,222,estimated_from_type_and_rating
+7,Hotel Dar Faiza,hotel,Houmt Souk,33.8745,10.8565,2.5,160,128,192,estimated_from_type_and_rating
+8,El Mouradi Djerba Menzel,hotel,Zone Touristique,33.8645,10.9185,3.5,190,152,228,estimated_from_type_and_rating
+9,Les Dunes Hotel,hotel,Zone Touristique,33.8665,10.9155,3.7,200,160,240,estimated_from_type_and_rating
+10,Dar Ali,maison,Houmt Souk,33.8752,10.8572,4.5,185,148,222,estimated_from_type_and_rating
+11,Fiesta Beach Club Hotel,hotel,Aghir,33.8335,10.8965,4.0,215,172,258,estimated_from_type_and_rating
+12,Dar Zitoun,local,Guellala,33.7085,10.7465,4.2,130,104,156,estimated_from_type_and_rating
+13,Hotel Arischa,hotel,Houmt Souk,33.8748,10.8568,4.2,225,180,270,estimated_from_type_and_rating
+14,Mövenpick Resort & Marine Spa,hotel,Zone Touristique,33.8695,10.9235,4.3,235,188,282,estimated_from_type_and_rating
+15,Dar Bibine,maison,Midoun,33.8078,10.9035,4.3,175,140,210,estimated_from_type_and_rating
+16,Hôtel Dar Jerba,hotel,Houmt Souk,33.8742,10.8575,3.9,210,168,252,estimated_from_type_and_rating
+17,Dar Boubaker,local,Ajim,33.7298,10.7135,4.1,125,100,150,estimated_from_type_and_rating
+18,Djerba Sun Club,hotel,Zone Touristique,33.8675,10.9205,3.5,190,152,228,estimated_from_type_and_rating
+19,Dar Midoun,maison,Midoun,33.8072,10.9028,4.2,170,136,204,estimated_from_type_and_rating
+20,Riadh Palms Resort & Spa,hotel,Zone Touristique,33.8638,10.9195,3.3,175,140,210,estimated_from_type_and_rating
+21,Djerba Castille Hotel,hotel,Houmt Souk,33.8755,10.8558,4.1,220,176,264,estimated_from_type_and_rating
+22,Dar Sidi Fredj,local,Houmt Souk,33.8825,10.8692,4.4,135,108,162,estimated_from_type_and_rating
+23,Hotel Ulysse Palace & Thalasso,hotel,Zone Touristique,33.8658,10.9165,4.3,235,188,282,estimated_from_type_and_rating
+24,Dar Guellala,local,Guellala,33.7078,10.7455,4.0,120,96,144,estimated_from_type_and_rating
+25,Hotel Amar,hotel,Houmt Souk,33.8745,10.8565,3.5,190,152,228,estimated_from_type_and_rating
+26,Palm Beach Club Hotel,hotel,Zone Touristique,33.8705,10.9245,4.0,215,172,258,estimated_from_type_and_rating
+27,Dar Lazuli,maison,Erriadh,33.8118,10.8585,4.5,185,148,222,estimated_from_type_and_rating
+28,Sangho Club Djerba,hotel,Midoun,33.8145,10.9045,3.6,195,156,234,estimated_from_type_and_rating
+29,Hotel Tanit Beach,hotel,Zone Touristique,33.8668,10.9175,3.8,205,164,246,estimated_from_type_and_rating
+30,Dar Cherif,local,Ajim,33.7305,10.7142,4.1,125,100,150,estimated_from_type_and_rating

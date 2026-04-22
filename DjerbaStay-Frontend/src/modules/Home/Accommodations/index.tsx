@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import AccommodationCard from "./AccommodationCard";
 import Icon from "@/components/Icon";
@@ -40,6 +40,9 @@ const accommodations = [
 
 export default function Accommodations() {
   const [selectedKind, setSelectedKind] = useState<AccommodationFilter>("all");
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const filteredAccommodations = useMemo(
     () =>
@@ -48,6 +51,61 @@ export default function Accommodations() {
         : accommodations.filter((item) => item.kind === selectedKind),
     [selectedKind]
   );
+
+  const updateArrowState = useCallback(() => {
+    const container = carouselRef.current;
+
+    if (!container) return;
+
+    const maxScrollLeft = container.scrollWidth - container.clientWidth;
+    setCanScrollLeft(container.scrollLeft > 2);
+    setCanScrollRight(container.scrollLeft < maxScrollLeft - 2);
+  }, []);
+
+  const slideByOneCard = useCallback((direction: "left" | "right") => {
+    const container = carouselRef.current;
+
+    if (!container) return;
+
+    const firstCard = container.querySelector<HTMLElement>(
+      "[data-accommodation-card]"
+    );
+    const computedStyles = window.getComputedStyle(container);
+    const gap = Number.parseFloat(computedStyles.columnGap || computedStyles.gap || "0");
+    const cardWidth = firstCard?.getBoundingClientRect().width ?? container.clientWidth * 0.85;
+    const offset = cardWidth + gap;
+
+    container.scrollBy({
+      left: direction === "right" ? offset : -offset,
+      behavior: "smooth",
+    });
+  }, []);
+
+  useEffect(() => {
+    const container = carouselRef.current;
+
+    if (!container) return;
+
+    const syncArrowState = () => updateArrowState();
+
+    syncArrowState();
+    container.addEventListener("scroll", syncArrowState, { passive: true });
+    window.addEventListener("resize", syncArrowState);
+
+    return () => {
+      container.removeEventListener("scroll", syncArrowState);
+      window.removeEventListener("resize", syncArrowState);
+    };
+  }, [filteredAccommodations, updateArrowState]);
+
+  useEffect(() => {
+    const container = carouselRef.current;
+
+    if (!container) return;
+
+    container.scrollTo({ left: 0, behavior: "smooth" });
+    updateArrowState();
+  }, [selectedKind, updateArrowState]);
 
   return (
     <div className="px-4 lg:px-20 py-16 traditional-pattern">
@@ -99,10 +157,41 @@ export default function Accommodations() {
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
-        {filteredAccommodations.map((item) => (
-          <AccommodationCard key={item.name} {...item} />
-        ))}
+      <div className="relative px-4">
+        <button
+          type="button"
+          onClick={() => slideByOneCard("left")}
+          disabled={!canScrollLeft}
+          className="absolute left-1 top-1/2 z-10 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 text-slate-700 dark:text-slate-200 shadow-lg transition hover:bg-white dark:hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
+          aria-label="Show previous accommodations"
+        >
+          <Icon name="chevron_left" className="size-6" />
+        </button>
+
+        <div
+          ref={carouselRef}
+          className="flex gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory px-14 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {filteredAccommodations.map((item) => (
+            <div
+              key={item.name}
+              data-accommodation-card
+              className="min-w-[280px] sm:min-w-[360px] lg:min-w-[380px] snap-start shrink-0"
+            >
+              <AccommodationCard {...item} />
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => slideByOneCard("right")}
+          disabled={!canScrollRight}
+          className="absolute right-1 top-1/2 z-10 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 text-slate-700 dark:text-slate-200 shadow-lg transition hover:bg-white dark:hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
+          aria-label="Show more accommodations"
+        >
+          <Icon name="chevron_right" className="size-6" />
+        </button>
       </div>
     </div>
   );
