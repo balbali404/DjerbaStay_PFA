@@ -9,6 +9,7 @@ import type { Accommodation } from "@/lib/backendApi";
 
 type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
+const PAGE_SIZE = 12;
 
 function toLocalImageUrl(backendUrl: string | null | undefined, name: string): string {
   if (backendUrl && !backendUrl.includes("localhost:4000")) {
@@ -36,6 +37,7 @@ export default function AccommodationsPage() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedKind, setSelectedKind] = useState<AccommodationFilter>("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchAccommodations()
@@ -61,6 +63,14 @@ export default function AccommodationsPage() {
     [accommodations, selectedKind]
   );
 
+  const totalPages = Math.max(1, Math.ceil(filteredAccommodations.length / PAGE_SIZE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedAccommodations = useMemo(() => {
+    const startIndex = (safeCurrentPage - 1) * PAGE_SIZE;
+    return filteredAccommodations.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredAccommodations, safeCurrentPage]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -83,7 +93,10 @@ export default function AccommodationsPage() {
 
           <div className="flex flex-wrap items-center gap-4">
             <button
-              onClick={() => setSelectedKind("all")}
+              onClick={() => {
+                setSelectedKind("all");
+                setCurrentPage(1);
+              }}
               className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all ${
                 selectedKind === "all"
                   ? "bg-primary text-white"
@@ -94,7 +107,10 @@ export default function AccommodationsPage() {
               All
             </button>
             <button
-              onClick={() => setSelectedKind("hotel")}
+              onClick={() => {
+                setSelectedKind("hotel");
+                setCurrentPage(1);
+              }}
               className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all ${
                 selectedKind === "hotel"
                   ? "bg-primary text-white"
@@ -105,7 +121,10 @@ export default function AccommodationsPage() {
               Hotels
             </button>
             <button
-              onClick={() => setSelectedKind("maison")}
+              onClick={() => {
+                setSelectedKind("maison");
+                setCurrentPage(1);
+              }}
               className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all ${
                 selectedKind === "maison"
                   ? "bg-primary text-white"
@@ -116,7 +135,10 @@ export default function AccommodationsPage() {
               Guest Houses
             </button>
             <button
-              onClick={() => setSelectedKind("local")}
+              onClick={() => {
+                setSelectedKind("local");
+                setCurrentPage(1);
+              }}
               className={`flex items-center gap-2 rounded-full px-6 py-3 transition-all ${
                 selectedKind === "local"
                   ? "bg-primary text-white"
@@ -130,7 +152,7 @@ export default function AccommodationsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-          {filteredAccommodations.map((item) => (
+          {paginatedAccommodations.map((item) => (
             <AccommodationCard
               key={item.id}
               id={item.id}
@@ -148,6 +170,48 @@ export default function AccommodationsPage() {
           <div className="text-center py-20 text-slate-400">
             <Icon name="search_off" className="size-12 mx-auto mb-4" />
             <p>No accommodations found</p>
+          </div>
+        )}
+
+        {filteredAccommodations.length > PAGE_SIZE && (
+          <div className="mt-24 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={safeCurrentPage === 1}
+              className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Previous
+            </button>
+
+            {Array.from({ length: totalPages }, (_, index) => {
+              const pageNumber = index + 1;
+              const isActive = safeCurrentPage === pageNumber;
+
+              return (
+                <button
+                  key={pageNumber}
+                  type="button"
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={`h-10 min-w-10 rounded-full px-3 text-sm font-semibold transition ${
+                    isActive
+                      ? "bg-primary text-white"
+                      : "border border-slate-200 text-slate-600 hover:border-primary hover:text-primary"
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              disabled={safeCurrentPage === totalPages}
+              className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

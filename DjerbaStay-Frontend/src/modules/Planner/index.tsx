@@ -73,6 +73,7 @@ export default function Planner() {
   const [budgetRevealStep, setBudgetRevealStep] = useState(0);
   const [usage, setUsage] = useState<MlUsage | null>(null);
   const [plannerRequestId, setPlannerRequestId] = useState<string | null>(null);
+  const [hasInitializedAutoPlay, setHasInitializedAutoPlay] = useState(false);
 
   const itinerary = useMemo(() => results?.itinerary ?? [], [results]);
 
@@ -186,8 +187,12 @@ export default function Planner() {
 
   useEffect(() => {
     if (!results) return;
-    setActivityIndex(-1);
-  }, [dayIndex, results]);
+    // Only reset activity index when results first load, not when manually navigating days
+    if (!hasInitializedAutoPlay) {
+      setActivityIndex(-1);
+      setHasInitializedAutoPlay(true);
+    }
+  }, [results, hasInitializedAutoPlay]);
 
   useEffect(() => {
     if (!autoPlay || !results) return;
@@ -335,6 +340,7 @@ export default function Planner() {
     setAutoPlay(false);
     setDayIndex(0);
     setActivityIndex(-1);
+    setHasInitializedAutoPlay(false);
     setState((prev) => ({ ...prev, step: 1 }));
     router.replace("/planner");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -398,14 +404,17 @@ export default function Planner() {
           onSelectDay={(index) => {
             setAutoPlay(false);
             setDayIndex(index);
+            setActivityIndex(-1);
           }}
           onPrevDay={() => {
             setAutoPlay(false);
             setDayIndex((prev) => Math.max(0, prev - 1));
+            setActivityIndex(-1);
           }}
           onNextDay={() => {
             setAutoPlay(false);
             setDayIndex((prev) => Math.min(itinerary.length - 1, prev + 1));
+            setActivityIndex(-1);
           }}
           onToggleAutoPlay={() => setAutoPlay((prev) => !prev)}
         />

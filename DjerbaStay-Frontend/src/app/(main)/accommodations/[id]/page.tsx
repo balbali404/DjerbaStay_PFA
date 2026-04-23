@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
+import AccommodationLocationMap from "@/components/AccommodationLocationMap";
 import Icon from "@/components/Icon";
 import { fetchAccommodations } from "@/lib/backendApi";
 import type { Accommodation } from "@/lib/backendApi";
@@ -139,18 +140,28 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
 
             <div className="bg-white rounded-2xl p-8 shadow-sm">
               <h2 className="text-2xl font-bold mb-4">Location</h2>
-              <div className="aspect-video w-full rounded-xl bg-slate-100 flex items-center justify-center">
-                <div className="text-center text-slate-400">
-                  <Icon name="map" className="size-12 mx-auto mb-2" />
-                  <p>Open this stay in Google Maps</p>
-                  <p className="text-sm">
-                    {accommodation.latitude}, {accommodation.longitude}
-                  </p>
+              <div className="space-y-4">
+                <AccommodationLocationMap
+                  name={accommodation.name}
+                  latitude={accommodation.latitude}
+                  longitude={accommodation.longitude}
+                  area={accommodation.area}
+                />
+
+                <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="text-sm text-slate-600">
+                    <p className="font-semibold text-slate-900">
+                      {accommodation.area || "Djerba, Tunisia"}
+                    </p>
+                    <p>
+                      {accommodation.latitude}, {accommodation.longitude}
+                    </p>
+                  </div>
                   <Link
                     href={getAccommodationMapUrl(accommodation)}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary/90"
+                    className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary/90"
                   >
                     View on Google Maps
                   </Link>

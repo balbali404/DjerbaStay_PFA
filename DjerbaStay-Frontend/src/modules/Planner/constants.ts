@@ -25,25 +25,25 @@ export const vibeCards = [
     id: "luxury" as const,
     title: "Luxury",
     subtitle: "Premium comfort",
-    image: "/images/planner/vibe-luxury.svg",
+    image: "/images/planner/vibe-luxury.jpg",
   },
   {
     id: "authentic" as const,
     title: "Authentic & Calm",
     subtitle: "Peaceful traditional",
-    image: "/images/planner/vibe-authentic.svg",
+    image: "/images/planner/vibe-authentic.jpg",
   },
   {
     id: "beach" as const,
     title: "Beachfront",
     subtitle: "Steps from sand",
-    image: "/images/planner/vibe-beach.svg",
+    image: "/images/planner/vibe-beach.jpg",
   },
   {
     id: "local" as const,
     title: "Local Experience",
     subtitle: "Live like a local",
-    image: "/images/planner/vibe-local.svg",
+    image: "/images/planner/vibe-local.png",
   },
 ];
 

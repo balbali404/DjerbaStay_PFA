@@ -475,7 +475,7 @@ export default function WizardPanel({
           <div className="rounded-2xl overflow-hidden grayscale opacity-50 contrast-125 border border-slate-200 h-48 relative">
             <Image
               className="w-full h-full object-cover"
-              src="/images/planner/map-preview.svg"
+              src="/images/planner/map-preview.jpg"
               alt="Djerba map preview"
               fill
               sizes="(max-width: 1024px) 100vw, 30vw"
