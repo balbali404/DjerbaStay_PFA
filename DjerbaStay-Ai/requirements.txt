@@ -4,3 +4,4 @@ scikit-learn
 geopy
 joblib
 matplotlib
+gunicorn
