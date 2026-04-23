@@ -327,12 +327,25 @@ async function requestJson<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers,
-    credentials: "include",
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
+      headers,
+      credentials: "include",
+      cache: "no-store",
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Network request failed";
+    throw new ApiError(
+      `Unable to reach backend API at ${API_BASE_URL}. ${message}`,
+      0,
+      "NETWORK_ERROR"
+    );
+  }
 
   if (response.status === 401 && requiresAuth && allowRefresh) {
     const refreshedToken = await refreshAccessToken();

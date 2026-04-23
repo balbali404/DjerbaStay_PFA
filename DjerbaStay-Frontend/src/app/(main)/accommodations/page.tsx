@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import AccommodationCard from "@/modules/Home/Accommodations/AccommodationCard";
 import Icon from "@/components/Icon";
-import { fetchAccommodations } from "@/lib/backendApi";
+import { ApiError, fetchAccommodations } from "@/lib/backendApi";
 import type { Accommodation } from "@/lib/backendApi";
 
 type AccommodationKind = "hotel" | "maison" | "local";
@@ -34,12 +34,22 @@ function toLocalImageUrl(backendUrl: string | null | undefined, name: string): s
 export default function AccommodationsPage() {
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedKind, setSelectedKind] = useState<AccommodationFilter>("all");
 
   useEffect(() => {
     fetchAccommodations()
-      .then(setAccommodations)
-      .catch(console.error)
+      .then((items) => {
+        setAccommodations(items);
+        setErrorMessage(null);
+      })
+      .catch((error: unknown) => {
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : "Unable to load accommodations. Please verify the backend is running.";
+        setErrorMessage(message);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -64,6 +74,12 @@ export default function AccommodationsPage() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-8">
           <h1 className="text-4xl font-bold">All Accommodations</h1>
+
+          {errorMessage && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
+              {errorMessage}
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center gap-4">
             <button
