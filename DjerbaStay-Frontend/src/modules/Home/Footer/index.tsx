@@ -1,5 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
-
+ 
 import Icon from "@/components/Icon";
 
 export default function Footer() {
@@ -7,11 +8,17 @@ export default function Footer() {
     <footer className="bg-white border-t border-slate-100 px-6 lg:px-20 py-12">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="space-y-4">
-          <div className="flex items-center gap-2 text-primary">
-            <Icon name="holiday_village" className="size-5" />
-            <h2 className="text-slate-900 text-xl font-extrabold">
-              DjerbaStay
-            </h2>
+          <div className="flex items-center gap-3 text-primary">
+            <div className="relative h-14 w-14 overflow-hidden">
+              <Image
+                src="/images/branding/logo-djerba-stay-preview.png"
+                alt="DjerbaStay logo"
+                fill
+                sizes="56px"
+                className="object-contain"
+              />
+            </div>
+            <h2 className="text-xl font-extrabold text-[#1C5296]">DjerbaStay</h2>
           </div>
           <p className="text-slate-500 text-sm leading-relaxed">
             Your intelligent companion for exploring the magical island of

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -66,12 +67,19 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3 px-4 py-4 sm:px-6 md:py-5 lg:px-16 xl:px-20">
         <Link href="/" className="flex items-center gap-3 text-primary">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 sm:size-12">
-            <Icon name="holiday_village" className="size-6 text-primary" />
+          <div className="relative h-14 w-14 overflow-hidden sm:h-16 sm:w-16">
+            <Image
+              src="/images/branding/logo-djerba-stay-preview.png"
+              alt="DjerbaStay logo"
+              fill
+              sizes="(min-width: 640px) 64px, 56px"
+              className="object-contain"
+              priority
+            />
           </div>
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary/80">Island Guide</p>
-            <h2 className="text-2xl font-black leading-none tracking-tight text-slate-900">DjerbaStay</h2>
+            <h2 className="text-2xl font-black leading-none tracking-tight text-[#1C5296]">DjerbaStay</h2>
           </div>
         </Link>
 
