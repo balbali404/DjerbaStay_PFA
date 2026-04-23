@@ -7,12 +7,14 @@ import {
   logoutUser,
   registerUser,
   refreshAccessToken,
+  saveLanguagePreference,
   updateProfile,
   updateSubscriptionPlan,
   type AuthSession,
   type CheckoutConfirmation,
   type CheckoutSession,
   type AuthUser,
+  type LanguageCode,
   type SubscriptionCode,
   type SubscriptionPlan,
   type UpdateProfilePayload,
@@ -23,6 +25,7 @@ export type {
   AuthUser,
   CheckoutConfirmation,
   CheckoutSession,
+  LanguageCode,
   SubscriptionCode,
   SubscriptionPlan,
   UpdateProfilePayload,
@@ -49,6 +52,10 @@ export async function logoutAccount(): Promise<void> {
 
 export async function getAuthenticatedUser(): Promise<AuthUser> {
   return fetchCurrentUser();
+}
+
+export async function updateLanguagePreference(language: LanguageCode): Promise<AuthUser> {
+  return saveLanguagePreference(language);
 }
 
 export async function getSubscriptionPlans(): Promise<SubscriptionPlan[]> {

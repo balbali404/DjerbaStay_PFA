@@ -21,6 +21,7 @@ export type SafeUser = {
   id: string;
   fullName: string;
   email: string;
+  language: string;
   plan: {
     code: SubscriptionCode;
     name: string;
@@ -34,6 +35,7 @@ export function asSafeUser(user: UserWithPlan): SafeUser {
     id: user.id,
     fullName: user.fullName,
     email: user.email,
+    language: user.language,
     plan: {
       code: user.plan.code,
       name: user.plan.name,

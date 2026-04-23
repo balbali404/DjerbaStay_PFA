@@ -20,10 +20,12 @@ import {
   startCheckout,
   switchSubscriptionPlan,
   tryRefreshSession,
+  updateLanguagePreference,
   updateProfileAccount,
   type CheckoutConfirmation,
   type CheckoutSession,
   type AuthUser,
+  type LanguageCode,
   type SubscriptionCode,
   type SubscriptionPlan,
   type UpdateProfilePayload,
@@ -49,6 +51,7 @@ type AuthSessionContextValue = {
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => Promise<void>;
   reloadUser: () => Promise<void>;
+  updateLanguage: (language: LanguageCode) => Promise<void>;
   updateProfile: (payload: UpdateProfilePayload) => Promise<void>;
   setPlan: (planCode: SubscriptionCode) => Promise<void>;
   createCheckout: (planCode: SubscriptionCode) => Promise<CheckoutSession>;
@@ -146,6 +149,11 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
     setUser(session.user);
   }, []);
 
+  const updateLanguage = useCallback(async (language: LanguageCode) => {
+    const updatedUser = await updateLanguagePreference(language);
+    setUser(updatedUser);
+  }, []);
+
   const createCheckout = useCallback(async (planCode: SubscriptionCode) => {
     return startCheckout(planCode);
   }, []);
@@ -170,6 +178,7 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       reloadUser,
+      updateLanguage,
       updateProfile,
       setPlan,
       createCheckout,
@@ -183,6 +192,7 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       reloadUser,
+      updateLanguage,
       updateProfile,
       setPlan,
       createCheckout,

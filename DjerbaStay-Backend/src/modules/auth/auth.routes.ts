@@ -6,7 +6,12 @@ import { env } from "../../config/env";
 import prisma from "../../config/prisma";
 import { authenticateAccessToken } from "../../core/middleware/auth.middleware";
 import { validateBody } from "../../core/middleware/validateRequest";
-import { loginSchema, registerSchema, updateProfileSchema } from "../../core/validators/schemas";
+import {
+  languagePreferenceSchema,
+  loginSchema,
+  registerSchema,
+  updateProfileSchema,
+} from "../../core/validators/schemas";
 import { verifyRefreshToken } from "../../utils/generateToken";
 import {
   asSafeUser,
@@ -198,6 +203,61 @@ router.get("/me", authenticateAccessToken, async (req, res, next) => {
     next(error);
   }
 });
+
+router.get("/preferences", authenticateAccessToken, async (req, res, next) => {
+  try {
+    const userId = req.user?.sub;
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { language: true },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    res.json({ language: user.language });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch(
+  "/preferences/language",
+  authenticateAccessToken,
+  validateBody(languagePreferenceSchema),
+  async (req, res, next) => {
+    try {
+      const userId = req.user?.sub;
+      if (!userId) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+
+      const { language } = req.body as {
+        language: string;
+      };
+
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: { language },
+        include: { plan: true },
+      });
+
+      res.json({
+        user: asSafeUser(updatedUser),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 router.patch(
   "/profile",

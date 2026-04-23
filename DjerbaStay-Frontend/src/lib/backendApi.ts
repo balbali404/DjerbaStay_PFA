@@ -25,11 +25,13 @@ export class ApiError extends Error {
 
 export type SubscriptionCode = "FREE" | "PLUS" | "PREMIUM";
 export type TransportMode = "taxi" | "car_rental" | "bus";
+export type LanguageCode = "en" | "fr" | "de";
 
 export type AuthUser = {
   id: string;
   fullName: string;
   email: string;
+  language: LanguageCode;
   plan: {
     code: SubscriptionCode;
     name: string;
@@ -189,6 +191,7 @@ export type BestRecommendation = {
   confidence: number;
   personality: string | null;
   interests: string;
+  vibe: "luxury" | "authentic" | "beach" | "local" | null;
   days: number;
   transport: TransportMode;
   budgetLevel: number;
@@ -196,6 +199,7 @@ export type BestRecommendation = {
   accommodation: {
     name: string;
     area: string | null;
+    imageUrl?: string | null;
   };
   topPlaces: string[];
   estimatedTotalCost: number | null;
@@ -429,6 +433,21 @@ export async function fetchCurrentUser(): Promise<AuthUser> {
   return response.user;
 }
 
+export async function saveLanguagePreference(language: LanguageCode): Promise<AuthUser> {
+  const response = await requestJson<{ user: AuthUser }>(
+    "/api/auth/preferences/language",
+    {
+      method: "PATCH",
+      body: JSON.stringify({ language }),
+    },
+    {
+      requiresAuth: true,
+    }
+  );
+
+  return response.user;
+}
+
 export async function fetchSubscriptionPlans(): Promise<SubscriptionPlan[]> {
   return requestJson<SubscriptionPlan[]>("/api/subscription/plans", {}, { requiresAuth: false });
 }
@@ -437,7 +456,7 @@ export async function fetchBestRecommendation(): Promise<BestRecommendation | nu
   const response = await requestJson<{ recommendation: BestRecommendation | null }>(
     "/api/recommendations/best",
     {},
-    { requiresAuth: false, allowRefresh: false }
+    { requiresAuth: true }
   );
 
   return response.recommendation;

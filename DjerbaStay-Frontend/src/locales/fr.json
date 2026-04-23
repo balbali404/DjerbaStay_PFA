@@ -1,0 +1,30 @@
+{
+  "common": {
+    "language": "Langue",
+    "chooseLanguage": "Choisir la langue",
+    "loading": "Chargement...",
+    "back": "Retour",
+    "next": "Suivant",
+    "clear": "Effacer",
+    "save": "Enregistrer",
+    "startingFrom": "A partir de",
+    "viewDetails": "Voir les details",
+    "day": "Jour",
+    "days": "{{count}} jours",
+    "travelers": "{{count}} voyageurs"
+  },
+  "header": {
+    "islandGuide": "Guide de l'ile",
+    "explore": "Explorer",
+    "planner": "Planificateur IA",
+    "stays": "Sejours",
+    "profile": "Profil",
+    "checkingSession": "Verification de la session...",
+    "logout": "Se deconnecter",
+    "signingOut": "Deconnexion...",
+    "register": "S'inscrire",
+    "login": "Connexion",
+    "signedInAs": "Connecte en tant que",
+    "plan": "offre"
+  }
+}

@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import AccommodationCard from "./AccommodationCard";
 import Icon from "@/components/Icon";
-import { fetchAccommodations } from "@/lib/backendApi";
 import type { Accommodation } from "@/lib/backendApi";
-import Link from "next/link";
+import { fetchAccommodations } from "@/lib/backendApi";
+import { useLanguage } from "@/lib/language";
+import AccommodationCard from "./AccommodationCard";
 
 type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
@@ -91,9 +92,8 @@ function toCardItem(item: Accommodation): AccommodationCardItem {
 }
 
 export default function Accommodations() {
-  const [accommodations, setAccommodations] = useState<AccommodationCardItem[]>(
-    FALLBACK_ACCOMMODATIONS
-  );
+  const { t } = useLanguage();
+  const [accommodations, setAccommodations] = useState<AccommodationCardItem[]>(FALLBACK_ACCOMMODATIONS);
   const [loading, setLoading] = useState(true);
   const [selectedKind, setSelectedKind] = useState<AccommodationFilter>("all");
 
@@ -134,7 +134,7 @@ export default function Accommodations() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-white">
+      <section className="bg-white py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center py-20">
             <Icon name="loading" className="size-8 animate-spin text-primary" />
@@ -145,60 +145,60 @@ export default function Accommodations() {
   }
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4 space-y-8">
-        <div className="flex gap-4 mt-6 md:mt-0">
+    <section className="bg-white py-16">
+      <div className="container mx-auto space-y-8 px-4">
+        <div className="mt-6 flex gap-4 md:mt-0">
           <button
             onClick={() => setSelectedKind("all")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold shadow-md transition-all ${
+            className={`flex items-center gap-2 rounded-full px-6 py-2 font-bold shadow-md transition-all ${
               selectedKind === "all"
                 ? "bg-primary text-white"
-                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary"
+                : "border border-slate-200 bg-white text-slate-700 hover:border-primary"
             }`}
             aria-pressed={selectedKind === "all"}
           >
             <Icon name="featured_seasonal_and_gifts" className="size-5" />
-            All
+            {t("home.accommodations.all")}
           </button>
           <button
             onClick={() => setSelectedKind("hotel")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold shadow-md transition-all ${
+            className={`flex items-center gap-2 rounded-full px-6 py-2 font-bold shadow-md transition-all ${
               selectedKind === "hotel"
                 ? "bg-primary text-white"
-                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary"
+                : "border border-slate-200 bg-white text-slate-700 hover:border-primary"
             }`}
             aria-pressed={selectedKind === "hotel"}
           >
             <Icon name="hotel" className="size-5" />
-            Hotels
+            {t("home.accommodations.hotels")}
           </button>
           <button
             onClick={() => setSelectedKind("maison")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold transition-all ${
+            className={`flex items-center gap-2 rounded-full px-6 py-2 font-bold transition-all ${
               selectedKind === "maison"
                 ? "bg-primary text-white shadow-md"
-                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary"
+                : "border border-slate-200 bg-white text-slate-700 hover:border-primary"
             }`}
             aria-pressed={selectedKind === "maison"}
           >
             <Icon name="home" className="size-5" />
-            Maison
+            {t("home.accommodations.maison")}
           </button>
           <button
             onClick={() => setSelectedKind("local")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold transition-all ${
+            className={`flex items-center gap-2 rounded-full px-6 py-2 font-bold transition-all ${
               selectedKind === "local"
                 ? "bg-primary text-white shadow-md"
-                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary"
+                : "border border-slate-200 bg-white text-slate-700 hover:border-primary"
             }`}
             aria-pressed={selectedKind === "local"}
           >
             <Icon name="apartment" className="size-5" />
-            Local
+            {t("home.accommodations.local")}
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {filteredAccommodations.slice(0, 3).map((item) => (
             <AccommodationCard
               key={`${item.id}-${item.name}`}
@@ -214,12 +214,12 @@ export default function Accommodations() {
         </div>
 
         {filteredAccommodations.length > 3 && (
-          <div className="text-center mt-8">
+          <div className="mt-8 text-center">
             <Link
               href="/accommodations"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3 font-bold text-white transition-all hover:bg-primary/90"
             >
-              View All {filteredAccommodations.length} Accommodations
+              {t("home.accommodations.viewAll", { count: filteredAccommodations.length })}
               <Icon name="arrow_forward" className="size-5" />
             </Link>
           </div>

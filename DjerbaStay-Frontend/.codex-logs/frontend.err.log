@@ -317,3 +317,7 @@ Ecmascript file had an error
 `ssr: false` is not allowed with `next/dynamic` in Server Components. Please move it into a Client Component.
 
 
+⚠ Fast Refresh had to perform a full reload when ./DjerbaStay-Frontend/src/lib/backendApi.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./DjerbaStay-Frontend/src/lib/backendApi.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./DjerbaStay-Frontend/src/lib/backendApi.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./DjerbaStay-Frontend/src/lib/backendApi.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload

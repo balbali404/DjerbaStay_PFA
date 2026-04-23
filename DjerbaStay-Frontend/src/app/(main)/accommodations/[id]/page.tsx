@@ -9,6 +9,7 @@ import AccommodationLocationMap from "@/components/AccommodationLocationMap";
 import Icon from "@/components/Icon";
 import { fetchAccommodations } from "@/lib/backendApi";
 import type { Accommodation } from "@/lib/backendApi";
+import { useLanguage } from "@/lib/language";
 
 interface AccommodationPageProps {
   params: Promise<{ id: string }>;
@@ -44,6 +45,7 @@ function getAccommodationMapUrl(accommodation: Accommodation): string {
 }
 
 export default function AccommodationPage({ params }: AccommodationPageProps) {
+  const { t } = useLanguage();
   const resolved = use(params);
   const accommodationId = parseInt(resolved.id, 10);
 
@@ -97,7 +99,7 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
             <div className="flex items-center gap-4 text-white/90">
               <div className="flex items-center gap-2">
                 <Icon name="location_on" className="size-5" />
-                <span>{accommodation.area || "Djerba"}</span>
+                <span>{accommodation.area || t("accommodations.detail.areaFallback")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Icon name="star" className="size-5 fill-amber-400 text-amber-400" />
@@ -112,19 +114,25 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 flex flex-col gap-8">
             <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h2 className="text-2xl font-bold mb-4">About</h2>
+              <h2 className="text-2xl font-bold mb-4">{t("accommodations.detail.about")}</h2>
               <p className="text-slate-600">
-                Experience ultimate relaxation at {accommodation.name}, a premier{" "}
-                {accommodation.type === "hotel" ? "hotel" : "accommodation"} in{" "}
-                {accommodation.area || "Djerba"}. With exceptional amenities and
-                world-class service, your stay will be unforgettable.
+                {t("accommodations.detail.aboutBody", {
+                  name: accommodation.name,
+                  type:
+                    accommodation.type === "hotel"
+                      ? t("accommodations.detail.typeHotel")
+                      : t("accommodations.detail.typeAccommodation"),
+                  area: accommodation.area || t("accommodations.detail.areaFallback"),
+                })}
               </p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h2 className="text-2xl font-bold mb-4">Amenities</h2>
+              <h2 className="text-2xl font-bold mb-4">{t("accommodations.detail.amenities")}</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {["Pool", "WiFi", "Restaurant", "Spa", "Gym", "Parking"].map(
+                {[0, 1, 2, 3, 4, 5].map((index) =>
+                  t(`accommodations.detail.amenitiesList.${index}`)
+                ).map(
                   (amenity) => (
                     <div
                       key={amenity}
@@ -139,7 +147,7 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
             </div>
 
             <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h2 className="text-2xl font-bold mb-4">Location</h2>
+              <h2 className="text-2xl font-bold mb-4">{t("accommodations.detail.location")}</h2>
               <div className="space-y-4">
                 <AccommodationLocationMap
                   name={accommodation.name}
@@ -151,7 +159,7 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
                 <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-sm text-slate-600">
                     <p className="font-semibold text-slate-900">
-                      {accommodation.area || "Djerba, Tunisia"}
+                      {accommodation.area || t("accommodations.detail.areaFallbackFull")}
                     </p>
                     <p>
                       {accommodation.latitude}, {accommodation.longitude}
@@ -163,7 +171,7 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
                     rel="noreferrer"
                     className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary/90"
                   >
-                    View on Google Maps
+                    {t("accommodations.detail.viewMaps")}
                   </Link>
                 </div>
               </div>
@@ -174,18 +182,18 @@ export default function AccommodationPage({ params }: AccommodationPageProps) {
             <div className="bg-white rounded-2xl p-8 shadow-sm sticky top-8">
               <div className="flex flex-col gap-4">
                 <div>
-                  <span className="text-slate-400">Starting from</span>
+                  <span className="text-slate-400">{t("common.startingFrom")}</span>
                   <div className="text-3xl font-bold text-primary">$150</div>
-                  <span className="text-slate-400">/night</span>
+                  <span className="text-slate-400">{t("accommodations.detail.night")}</span>
                 </div>
 
                 <button className="w-full bg-primary text-white py-4 rounded-xl font-medium hover:bg-primary/90 transition-all">
-                  Book Now
+                  {t("accommodations.detail.bookNow")}
                 </button>
 
                 <button className="w-full border-2 border-primary text-primary py-4 rounded-xl font-medium hover:bg-primary/10 transition-all flex items-center justify-center gap-2">
                   <Icon name="favorite" className="size-5" />
-                  Save to Favorites
+                  {t("accommodations.detail.saveFavorites")}
                 </button>
               </div>
             </div>

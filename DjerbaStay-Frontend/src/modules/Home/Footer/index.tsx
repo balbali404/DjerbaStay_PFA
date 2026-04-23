@@ -1,12 +1,17 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
- 
+
 import Icon from "@/components/Icon";
+import { useLanguage } from "@/lib/language";
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
-    <footer className="bg-white border-t border-slate-100 px-6 lg:px-20 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+    <footer className="border-t border-slate-100 bg-white px-6 py-12 lg:px-20">
+      <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
         <div className="space-y-4">
           <div className="flex items-center gap-3 text-primary">
             <div className="relative h-14 w-14 overflow-hidden">
@@ -20,90 +25,46 @@ export default function Footer() {
             </div>
             <h2 className="text-xl font-extrabold text-[#1C5296]">DjerbaStay</h2>
           </div>
-          <p className="text-slate-500 text-sm leading-relaxed">
-            Your intelligent companion for exploring the magical island of
-            Djerba, Tunisia.
-          </p>
+          <p className="text-sm leading-relaxed text-slate-500">{t("home.footer.description")}</p>
         </div>
         <div>
-          <h4 className="font-bold mb-6">Quick Links</h4>
+          <h4 className="mb-6 font-bold">{t("home.footer.quickLinks")}</h4>
           <ul className="space-y-4 text-sm text-slate-500">
-            <li>
-              <Link className="hover:text-primary transition-colors" href="#">
-                Discover Hotels
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-primary transition-colors" href="#">
-                Traditional Houses
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-primary transition-colors" href="#">
-                Island Planner
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-primary transition-colors" href="#">
-                Travel Blog
-              </Link>
-            </li>
+            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.discoverHotels")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.traditionalHouses")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.islandPlanner")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.travelBlog")}</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-6">Support</h4>
+          <h4 className="mb-6 font-bold">{t("home.footer.support")}</h4>
           <ul className="space-y-4 text-sm text-slate-500">
-            <li>
-              <Link className="hover:text-primary transition-colors" href="#">
-                Help Center
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-primary transition-colors" href="#">
-                Safety Info
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-primary transition-colors" href="#">
-                Partner Program
-              </Link>
-            </li>
-            <li>
-              <Link className="hover:text-primary transition-colors" href="#">
-                Privacy Policy
-              </Link>
-            </li>
+            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.helpCenter")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.safetyInfo")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.partnerProgram")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.privacyPolicy")}</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-6">Connect</h4>
+          <h4 className="mb-6 font-bold">{t("home.footer.connect")}</h4>
           <div className="flex gap-4">
-            <Link
-              className="size-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
-              href="#"
-            >
+            <Link className="flex size-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-all hover:bg-primary hover:text-white" href="#">
               <Icon name="public" className="size-4" />
             </Link>
-            <Link
-              className="size-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
-              href="#"
-            >
+            <Link className="flex size-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-all hover:bg-primary hover:text-white" href="#">
               <Icon name="camera_alt" className="size-4" />
             </Link>
-            <Link
-              className="size-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-all"
-              href="#"
-            >
+            <Link className="flex size-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-all hover:bg-primary hover:text-white" href="#">
               <Icon name="alternate_email" className="size-4" />
             </Link>
           </div>
         </div>
       </div>
-      <div className="mt-20 pt-8 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium">
-        <p>© 2024 DjerbaStay. All rights reserved.</p>
+      <div className="mt-20 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-8 text-xs font-medium text-slate-400 md:flex-row">
+        <p>{t("home.footer.rights")}</p>
         <div className="flex gap-6">
-          <Link href="#">Terms of Service</Link>
-          <Link href="#">Cookie Settings</Link>
+          <Link href="#">{t("home.footer.terms")}</Link>
+          <Link href="#">{t("home.footer.cookies")}</Link>
         </div>
       </div>
     </footer>

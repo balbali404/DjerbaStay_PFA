@@ -3,6 +3,7 @@ import { Sora } from "next/font/google";
 
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { AuthSessionProvider } from "@/lib/authSession";
+import { LanguageProvider } from "@/lib/language";
 
 import "./globals.css";
 
@@ -50,15 +51,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sora.variable} light`}>
+    <html lang="en" className={`${sora.variable} light`} suppressHydrationWarning>
       <body className="font-display bg-background-light text-slate-900 antialiased">
         <AuthSessionProvider>
-          <ServiceWorkerRegister />
-          <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-            <div className="layout-container flex h-full grow flex-col">
-              {children}
+          <LanguageProvider>
+            <ServiceWorkerRegister />
+            <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+              <div className="layout-container flex h-full grow flex-col">
+                {children}
+              </div>
             </div>
-          </div>
+          </LanguageProvider>
         </AuthSessionProvider>
       </body>
     </html>

@@ -14,6 +14,10 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+export const languagePreferenceSchema = z.object({
+  language: z.enum(["en", "fr", "de"]),
+});
+
 export const updatePlanSchema = z.object({
   planCode: z.nativeEnum(SubscriptionCode),
 });

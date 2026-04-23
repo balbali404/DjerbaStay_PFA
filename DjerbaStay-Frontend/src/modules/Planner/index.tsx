@@ -1,34 +1,31 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import Icon from "@/components/Icon";
 import {
   generatePlanner,
-  getMlUsage,
   getAccommodations,
+  getMlUsage,
   getPlannerById,
   type Accommodation,
   type MlUsage,
 } from "@/lib/aiClient";
 import { useAuthSession } from "@/lib/authSession";
+import { useLanguage } from "@/lib/language";
 import { MAX_DAYS } from "./constants";
 import type { PlannerState, ToastMessage, ToastType, TripResult, WizardStep } from "./types";
 import { buildInterests, getErrorMessage } from "./utils";
 
 const ResultsPanel = dynamic(() => import("./components/ResultsPanel"), {
-  loading: () => (
-    <div className="h-[440px] animate-pulse rounded-3xl border border-slate-200 bg-white/70" />
-  ),
+  loading: () => <div className="h-[440px] animate-pulse rounded-3xl border border-slate-200 bg-white/70" />,
 });
 
 const WizardPanel = dynamic(() => import("./components/WizardPanel"), {
-  loading: () => (
-    <div className="h-[440px] animate-pulse rounded-3xl border border-slate-200 bg-white/70" />
-  ),
+  loading: () => <div className="h-[440px] animate-pulse rounded-3xl border border-slate-200 bg-white/70" />,
 });
 
 function createDefaultDate() {
@@ -37,29 +34,32 @@ function createDefaultDate() {
   return tomorrow;
 }
 
-const initialState: PlannerState = {
-  step: 1,
-  vibe: "authentic",
-  budgetLevel: 2,
-  groupType: "family",
-  persons: 2,
-  days: 3,
-  startDate: createDefaultDate(),
-  transport: "taxi",
-  accId: null,
-  accName: null,
-  accLat: null,
-  accLon: null,
-  accArea: null,
-};
+function createInitialState(): PlannerState {
+  return {
+    step: 1,
+    vibe: "authentic",
+    budgetLevel: 2,
+    groupType: "family",
+    persons: 2,
+    days: 3,
+    startDate: createDefaultDate(),
+    transport: "taxi",
+    accId: null,
+    accName: null,
+    accLat: null,
+    accLon: null,
+    accArea: null,
+  };
+}
 
 export default function Planner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const plannerRequestIdFromUrl = searchParams.get("requestId");
   const { isAuthenticated, isInitializing } = useAuthSession();
+  const { t } = useLanguage();
 
-  const [state, setState] = useState<PlannerState>(initialState);
+  const [state, setState] = useState<PlannerState>(createInitialState);
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [filteredAccommodations, setFilteredAccommodations] = useState<Accommodation[]>([]);
   const [loadingAccommodations, setLoadingAccommodations] = useState(true);
@@ -84,7 +84,9 @@ export default function Planner() {
   useEffect(() => {
     const timer = toast ? setTimeout(() => setToast(null), 3500) : undefined;
     return () => {
-      if (timer) clearTimeout(timer);
+      if (timer) {
+        clearTimeout(timer);
+      }
     };
   }, [toast]);
 
@@ -98,7 +100,9 @@ export default function Planner() {
           isAuthenticated ? getMlUsage().catch(() => null) : Promise.resolve(null),
         ]);
 
-        if (!isMounted) return;
+        if (!isMounted) {
+          return;
+        }
 
         setAccommodations(accommodationData);
         setFilteredAccommodations(accommodationData);
@@ -106,8 +110,10 @@ export default function Planner() {
           setUsage(usageData);
         }
       } catch {
-        if (!isMounted) return;
-        showToast("Failed to load accommodations", "error");
+        if (!isMounted) {
+          return;
+        }
+        showToast(t("planner.failedAccommodations"), "error");
       } finally {
         if (isMounted) {
           setLoadingAccommodations(false);
@@ -120,7 +126,7 @@ export default function Planner() {
     return () => {
       isMounted = false;
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, t]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -138,7 +144,9 @@ export default function Planner() {
 
     getPlannerById(plannerRequestIdFromUrl)
       .then((data) => {
-        if (!isMounted) return;
+        if (!isMounted) {
+          return;
+        }
 
         setPlannerRequestId(data.id);
         setResults({ ...data.tripPlan, budget: data.budget });
@@ -157,8 +165,10 @@ export default function Planner() {
         }));
       })
       .catch(() => {
-        if (!isMounted) return;
-        showToast("Failed to load planner request by ID", "error");
+        if (!isMounted) {
+          return;
+        }
+        showToast(t("planner.failedPlannerById"), "error");
       })
       .finally(() => {
         if (isMounted) {
@@ -169,10 +179,12 @@ export default function Planner() {
     return () => {
       isMounted = false;
     };
-  }, [plannerRequestIdFromUrl, isAuthenticated]);
+  }, [plannerRequestIdFromUrl, isAuthenticated, t]);
 
   useEffect(() => {
-    if (!results?.budget) return;
+    if (!results?.budget) {
+      return;
+    }
 
     setBudgetRevealStep(0);
     const timers: Array<ReturnType<typeof setTimeout>> = [];
@@ -186,8 +198,10 @@ export default function Planner() {
   }, [results]);
 
   useEffect(() => {
-    if (!results) return;
-    // Only reset activity index when results first load, not when manually navigating days
+    if (!results) {
+      return;
+    }
+
     if (!hasInitializedAutoPlay) {
       setActivityIndex(-1);
       setHasInitializedAutoPlay(true);
@@ -195,7 +209,9 @@ export default function Planner() {
   }, [results, hasInitializedAutoPlay]);
 
   useEffect(() => {
-    if (!autoPlay || !results) return;
+    if (!autoPlay || !results) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       advanceActivity();
@@ -206,7 +222,9 @@ export default function Planner() {
   }, [autoPlay, results, dayIndex, activityIndex]);
 
   function advanceActivity() {
-    if (!results) return;
+    if (!results) {
+      return;
+    }
 
     const places = itinerary[dayIndex]?.places ?? [];
     if (!places.length) {
@@ -225,7 +243,7 @@ export default function Planner() {
         setActivityIndex(-1);
       } else {
         setAutoPlay(false);
-        showToast("Itinerary complete!", "success");
+        showToast(t("planner.itineraryComplete"), "success");
       }
       return;
     }
@@ -262,9 +280,7 @@ export default function Planner() {
     const q = query.toLowerCase();
     setFilteredAccommodations(
       accommodations.filter(
-        (acc) =>
-          acc.name.toLowerCase().includes(q) ||
-          (acc.area || "").toLowerCase().includes(q)
+        (acc) => acc.name.toLowerCase().includes(q) || (acc.area || "").toLowerCase().includes(q)
       )
     );
   }
@@ -278,7 +294,7 @@ export default function Planner() {
       accLon: acc.longitude,
       accArea: acc.area || "Djerba",
     }));
-    showToast(`Selected: ${acc.name}`);
+    showToast(t("planner.selected", { name: acc.name }));
   }
 
   function clearAccommodation() {
@@ -295,7 +311,7 @@ export default function Planner() {
 
   async function generateStay() {
     if (!state.accId || !state.accName || state.accLat === null || state.accLon === null) {
-      showToast("Please select an accommodation", "error");
+      showToast(t("planner.selectAccommodation"), "error");
       navigateStep(3);
       return;
     }
@@ -320,7 +336,7 @@ export default function Planner() {
       setPlannerRequestId(response.requestId);
       setUsage(response.usage);
       setResults({ ...response.tripPlan, budget: response.budget });
-      showToast("Your personalized itinerary is ready!", "success");
+      showToast(t("planner.itineraryReady"), "success");
       router.replace(`/planner?requestId=${response.requestId}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -341,31 +357,26 @@ export default function Planner() {
     setDayIndex(0);
     setActivityIndex(-1);
     setHasInitializedAutoPlay(false);
-    setState((prev) => ({ ...prev, step: 1 }));
+    setState(createInitialState());
     router.replace("/planner");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-6 lg:px-20 py-10">
+    <div className="mx-auto w-full max-w-7xl px-6 py-10 lg:px-20">
       {!isInitializing && !isAuthenticated ? (
         <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <h2 className="text-2xl font-black text-slate-900">Sign in to use the AI planner</h2>
-          <p className="mt-3 text-slate-500">
-            Planner generation is secured through the Express backend and requires your account session.
-          </p>
+          <h2 className="text-2xl font-black text-slate-900">{t("planner.authTitle")}</h2>
+          <p className="mt-3 text-slate-500">{t("planner.authBody")}</p>
           <div className="mt-6 flex items-center justify-center gap-3">
-            <Link
-              href="/login"
-              className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary/90"
-            >
-              Login
+            <Link href="/login" className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary/90">
+              {t("header.login")}
             </Link>
             <Link
               href="/register"
               className="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50"
             >
-              Register
+              {t("header.register")}
             </Link>
           </div>
         </div>
@@ -373,74 +384,66 @@ export default function Planner() {
 
       {isInitializing || !isAuthenticated ? null : (
         <>
-      {toast && (
-        <div className="toast-container">
-          <div className={`toast toast-${toast.type}`}>
-            <Icon
-              name={
-                toast.type === "success"
-                  ? "check_circle"
-                  : toast.type === "error"
-                    ? "error"
-                    : "warning"
-              }
-              className="size-5"
-            />
-            {toast.message}
-          </div>
-        </div>
-      )}
+          {toast ? (
+            <div className="toast-container">
+              <div className={`toast toast-${toast.type}`}>
+                <Icon
+                  name={toast.type === "success" ? "check_circle" : toast.type === "error" ? "error" : "warning"}
+                  className="size-5"
+                />
+                {toast.message}
+              </div>
+            </div>
+          ) : null}
 
-      {results ? (
-        <ResultsPanel
-          results={results}
-          plannerRequestId={plannerRequestId}
-          state={state}
-          dayIndex={dayIndex}
-          activityIndex={activityIndex}
-          autoPlay={autoPlay}
-          budgetRevealStep={budgetRevealStep}
-          onRestart={resetPlanner}
-          onSelectDay={(index) => {
-            setAutoPlay(false);
-            setDayIndex(index);
-            setActivityIndex(-1);
-          }}
-          onPrevDay={() => {
-            setAutoPlay(false);
-            setDayIndex((prev) => Math.max(0, prev - 1));
-            setActivityIndex(-1);
-          }}
-          onNextDay={() => {
-            setAutoPlay(false);
-            setDayIndex((prev) => Math.min(itinerary.length - 1, prev + 1));
-            setActivityIndex(-1);
-          }}
-          onToggleAutoPlay={() => setAutoPlay((prev) => !prev)}
-        />
-      ) : (
-        <WizardPanel
-          state={state}
-          usage={usage}
-          filteredAccommodations={filteredAccommodations}
-          loadingAccommodations={loadingAccommodations || loadingSavedPlanner}
-          isGenerating={isGenerating || loadingSavedPlanner}
-          onNavigateStep={navigateStep}
-          onSetVibe={(vibe) => setState((prev) => ({ ...prev, vibe }))}
-          onSetBudgetLevel={(budgetLevel) =>
-            setState((prev) => ({ ...prev, budgetLevel }))
-          }
-          onSetGroupType={(groupType) => setState((prev) => ({ ...prev, groupType }))}
-          onAdjustPersons={adjustPersons}
-          onAdjustDays={adjustDays}
-          onSetDate={setDate}
-          onFilterAccommodations={filterAccommodations}
-          onPickAccommodation={pickAccommodation}
-          onClearAccommodation={clearAccommodation}
-          onSetTransport={(transport) => setState((prev) => ({ ...prev, transport }))}
-          onGenerate={generateStay}
-        />
-      )}
+          {results ? (
+            <ResultsPanel
+              results={results}
+              plannerRequestId={plannerRequestId}
+              state={state}
+              dayIndex={dayIndex}
+              activityIndex={activityIndex}
+              autoPlay={autoPlay}
+              budgetRevealStep={budgetRevealStep}
+              onRestart={resetPlanner}
+              onSelectDay={(index) => {
+                setAutoPlay(false);
+                setDayIndex(index);
+                setActivityIndex(-1);
+              }}
+              onPrevDay={() => {
+                setAutoPlay(false);
+                setDayIndex((prev) => Math.max(0, prev - 1));
+                setActivityIndex(-1);
+              }}
+              onNextDay={() => {
+                setAutoPlay(false);
+                setDayIndex((prev) => Math.min(itinerary.length - 1, prev + 1));
+                setActivityIndex(-1);
+              }}
+              onToggleAutoPlay={() => setAutoPlay((prev) => !prev)}
+            />
+          ) : (
+            <WizardPanel
+              state={state}
+              usage={usage}
+              filteredAccommodations={filteredAccommodations}
+              loadingAccommodations={loadingAccommodations || loadingSavedPlanner}
+              isGenerating={isGenerating || loadingSavedPlanner}
+              onNavigateStep={navigateStep}
+              onSetVibe={(vibe) => setState((prev) => ({ ...prev, vibe }))}
+              onSetBudgetLevel={(budgetLevel) => setState((prev) => ({ ...prev, budgetLevel }))}
+              onSetGroupType={(groupType) => setState((prev) => ({ ...prev, groupType }))}
+              onAdjustPersons={adjustPersons}
+              onAdjustDays={adjustDays}
+              onSetDate={setDate}
+              onFilterAccommodations={filterAccommodations}
+              onPickAccommodation={pickAccommodation}
+              onClearAccommodation={clearAccommodation}
+              onSetTransport={(transport) => setState((prev) => ({ ...prev, transport }))}
+              onGenerate={generateStay}
+            />
+          )}
         </>
       )}
     </div>

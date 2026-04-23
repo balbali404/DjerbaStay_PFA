@@ -5,25 +5,32 @@ import { useEffect, useMemo, useState } from "react";
 
 import Icon from "@/components/Icon";
 import { getBestRecommendation, type BestRecommendation } from "@/lib/aiClient";
+import { useLanguage } from "@/lib/language";
+import { vibeCards } from "@/modules/Planner/constants";
 
-function formatBudget(totalCost: number | null): string {
+function formatBudget(totalCost: number | null, locale: string, naLabel: string): string {
   if (totalCost === null) {
-    return "N/A";
+    return naLabel;
   }
 
-  return `$${Math.round(totalCost)}`;
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(Math.round(totalCost));
 }
 
-function formatDateLabel(isoDate: string): string {
+function formatDateLabel(isoDate: string, locale: string, fallback: string): string {
   const parsed = new Date(isoDate);
   if (Number.isNaN(parsed.getTime())) {
-    return "Recently";
+    return fallback;
   }
 
-  return parsed.toLocaleDateString();
+  return parsed.toLocaleDateString(locale);
 }
 
 export default function HowItWorks() {
+  const { t, locale } = useLanguage();
   const [bestRecommendation, setBestRecommendation] = useState<BestRecommendation | null>(null);
   const [isLoadingRecommendation, setIsLoadingRecommendation] = useState(true);
 
@@ -68,83 +75,78 @@ export default function HowItWorks() {
   }, [bestRecommendation]);
 
   const topPlaces = bestRecommendation?.topPlaces ?? [];
+  const selectedVibeImage =
+    vibeCards.find((card) => card.id === bestRecommendation?.vibe)?.image ?? "/images/home/how-ml-1.svg";
+  const selectedAccommodationImage =
+    bestRecommendation?.accommodation.imageUrl ?? "/images/home/how-ml-2.svg";
 
   return (
-    <div className="bg-primary/5 py-24 px-4 lg:px-20 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -ml-32 -mb-32"></div>
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
-        <div className="lg:w-1/2 space-y-8">
+    <div className="relative overflow-hidden bg-primary/5 px-4 py-24 lg:px-20">
+      <div className="absolute -mt-32 -mr-32 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+      <div className="absolute bottom-0 left-0 -mb-32 -ml-32 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-16 lg:flex-row">
+        <div className="space-y-8 lg:w-1/2">
           <div>
-            <h4 className="text-primary font-extrabold tracking-widest text-sm uppercase mb-4 flex items-center gap-2">
+            <h4 className="mb-4 flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-primary">
               <Icon name="smart_toy" className="size-5" />
-              Powered by Machine Learning
+              {t("home.how.eyebrow")}
             </h4>
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
-              Stay Planning, <br />
-              <span className="text-primary">Evolved.</span>
+            <h2 className="text-4xl font-black leading-tight text-slate-900 md:text-5xl">
+              {t("home.how.titleLine1")} <br />
+              <span className="text-primary">{t("home.how.titleLine2")}</span>
             </h2>
           </div>
-          <p className="text-slate-600 text-lg leading-relaxed">
-            Our recommendation engine now highlights the best saved ML result from real planner runs,
-            so visitors can see what the model is producing in production.
-          </p>
+          <p className="text-lg leading-relaxed text-slate-600">{t("home.how.description")}</p>
           <div className="space-y-6">
             <div className="flex gap-4">
-              <div className="size-12 rounded-xl bg-white dark:bg-slate-800 shadow-md flex items-center justify-center shrink-0">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-md">
                 <Icon name="psychology" className="size-5 text-primary" />
               </div>
               <div>
-                <h5 className="font-bold text-slate-900">Recommendation Engine</h5>
-                <p className="text-slate-500 text-sm">
-                  ML results are saved to the database and ranked by confidence.
-                </p>
+                <h5 className="font-bold text-slate-900">{t("home.how.feature1Title")}</h5>
+                <p className="text-sm text-slate-500">{t("home.how.feature1Body")}</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="size-12 rounded-xl bg-white dark:bg-slate-800 shadow-md flex items-center justify-center shrink-0">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-md">
                 <Icon name="magic_button" className="size-5 text-primary" />
               </div>
               <div>
-                <h5 className="font-bold text-slate-900">Best Result Live Preview</h5>
-                <p className="text-slate-500 text-sm">
-                  The card on the right updates from saved planner output.
-                </p>
+                <h5 className="font-bold text-slate-900">{t("home.how.feature2Title")}</h5>
+                <p className="text-sm text-slate-500">{t("home.how.feature2Body")}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="lg:w-1/2 relative">
-          <div className="relative z-10 bg-white p-8 rounded-3xl shadow-2xl border border-primary/20">
+        <div className="relative lg:w-1/2">
+          <div className="relative z-10 rounded-3xl border border-primary/20 bg-white p-8 shadow-2xl">
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <span className="font-bold">Recommendation Engine</span>
+                <span className="font-bold">{t("home.how.engineLabel")}</span>
                 <Icon name="more_horiz" className="size-5 text-primary" />
               </div>
 
-              <div className="flex items-center gap-4 bg-primary/5 p-4 rounded-xl border border-primary/10">
-                <div className="size-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <div className="flex items-center gap-4 rounded-xl border border-primary/10 bg-primary/5 p-4">
+                <div className="flex size-10 items-center justify-center rounded-full bg-primary/20">
                   <Icon name="bolt" className="size-4 text-primary" />
                 </div>
-                <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${matchPercent}%` }}></div>
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200">
+                  <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${matchPercent}%` }} />
                 </div>
-                <span className="text-xs font-bold text-primary">{matchPercent}% Match</span>
+                <span className="text-xs font-bold text-primary">{t("home.how.match", { count: matchPercent })}</span>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
+              <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
                 {isLoadingRecommendation ? (
-                  <p className="text-sm text-slate-500">Loading best saved ML result...</p>
+                  <p className="text-sm text-slate-500">{t("home.how.loading")}</p>
                 ) : bestRecommendation ? (
                   <>
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-slate-500">Best Result</p>
-                      <p className="text-lg font-bold text-slate-900">
-                        {bestRecommendation.accommodation.name}
-                      </p>
+                      <p className="text-xs uppercase tracking-wide text-slate-500">{t("home.how.bestResult")}</p>
+                      <p className="text-lg font-bold text-slate-900">{bestRecommendation.accommodation.name}</p>
                       <p className="text-sm text-slate-500">
-                        {bestRecommendation.personality || "Traveler profile"} · {bestRecommendation.days} days · {bestRecommendation.transport}
+                        {bestRecommendation.personality || t("home.how.travelerProfile")} · {t("common.days", { count: bestRecommendation.days })} · {bestRecommendation.transport}
                       </p>
                     </div>
 
@@ -159,35 +161,37 @@ export default function HowItWorks() {
                           </span>
                         ))
                       ) : (
-                        <span className="text-xs text-slate-500">No place highlights available</span>
+                        <span className="text-xs text-slate-500">{t("home.how.noPlaces")}</span>
                       )}
                     </div>
 
                     <p className="text-xs text-slate-500">
-                      Budget estimate: <span className="font-semibold text-slate-700">{formatBudget(bestRecommendation.estimatedTotalCost)}</span> · Saved {formatDateLabel(bestRecommendation.createdAt)}
+                      {t("home.how.budgetEstimate")}{" "}
+                      <span className="font-semibold text-slate-700">
+                        {formatBudget(bestRecommendation.estimatedTotalCost, locale, t("home.how.na"))}
+                      </span>{" "}
+                      · {t("home.how.saved", { date: formatDateLabel(bestRecommendation.createdAt, locale, t("home.how.recently")) })}
                     </p>
                   </>
                 ) : (
-                  <p className="text-sm text-slate-500">
-                    No saved planner result yet. Generate your first ML plan to populate this section.
-                  </p>
+                  <p className="text-sm text-slate-500">{t("home.how.empty")}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="aspect-square rounded-xl bg-slate-100 border-2 border-primary relative overflow-hidden">
+                <div className="relative aspect-square overflow-hidden rounded-xl border-2 border-primary bg-slate-100">
                   <Image
-                    src="/images/home/how-ml-1.svg"
-                    alt="Preference analysis"
+                    src={selectedVibeImage}
+                    alt={bestRecommendation?.vibe ? `${bestRecommendation.vibe} vibe` : "Selected vibe"}
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 50vw, 20vw"
                   />
                 </div>
-                <div className="aspect-square rounded-xl bg-slate-100 opacity-70 relative overflow-hidden">
+                <div className="relative aspect-square overflow-hidden rounded-xl bg-slate-100 opacity-70">
                   <Image
-                    src="/images/home/how-ml-2.svg"
-                    alt="Activity clusters"
+                    src={selectedAccommodationImage}
+                    alt={bestRecommendation?.accommodation.name || "Selected accommodation"}
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 50vw, 20vw"
@@ -195,13 +199,11 @@ export default function HowItWorks() {
                 </div>
               </div>
               <div className="text-center">
-                <p className="text-xs text-slate-400 font-medium">
-                  ML output is saved and ranked from real planner generations.
-                </p>
+                <p className="text-xs font-medium text-slate-400">{t("home.how.footer")}</p>
               </div>
             </div>
           </div>
-          <div className="absolute -bottom-6 -right-6 z-0 w-full h-full bg-primary/10 rounded-3xl -rotate-3"></div>
+          <div className="absolute -bottom-6 -right-6 z-0 h-full w-full -rotate-3 rounded-3xl bg-primary/10" />
         </div>
       </div>
     </div>

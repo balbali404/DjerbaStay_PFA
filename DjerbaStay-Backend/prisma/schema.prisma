@@ -36,6 +36,7 @@ model User {
   fullName       String
   email          String         @unique
   passwordHash   String
+  language       String         @default("en")
   planId         String
   plan           SubscriptionPlan @relation(fields: [planId], references: [id])
   refreshTokens  RefreshToken[]

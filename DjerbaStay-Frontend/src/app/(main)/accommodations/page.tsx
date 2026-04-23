@@ -6,6 +6,7 @@ import AccommodationCard from "@/modules/Home/Accommodations/AccommodationCard";
 import Icon from "@/components/Icon";
 import { ApiError, fetchAccommodations } from "@/lib/backendApi";
 import type { Accommodation } from "@/lib/backendApi";
+import { useLanguage } from "@/lib/language";
 
 type AccommodationKind = "hotel" | "maison" | "local";
 type AccommodationFilter = AccommodationKind | "all";
@@ -33,6 +34,7 @@ function toLocalImageUrl(backendUrl: string | null | undefined, name: string): s
 }
 
 export default function AccommodationsPage() {
+  const { t } = useLanguage();
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -49,11 +51,11 @@ export default function AccommodationsPage() {
         const message =
           error instanceof ApiError
             ? error.message
-            : "Unable to load accommodations. Please verify the backend is running.";
+            : t("accommodations.loadError");
         setErrorMessage(message);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   const filteredAccommodations = useMemo(
     () =>
@@ -83,7 +85,7 @@ export default function AccommodationsPage() {
     <main className="min-h-screen bg-white py-16">
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-8">
-          <h1 className="text-4xl font-bold">All Accommodations</h1>
+          <h1 className="text-4xl font-bold">{t("accommodations.title")}</h1>
 
           {errorMessage && (
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
@@ -104,7 +106,7 @@ export default function AccommodationsPage() {
               }`}
             >
               <Icon name="apartment" className="size-5" />
-              All
+              {t("accommodations.all")}
             </button>
             <button
               onClick={() => {
@@ -118,7 +120,7 @@ export default function AccommodationsPage() {
               }`}
             >
               <Icon name="apartment" className="size-5" />
-              Hotels
+              {t("accommodations.hotels")}
             </button>
             <button
               onClick={() => {
@@ -132,7 +134,7 @@ export default function AccommodationsPage() {
               }`}
             >
               <Icon name="home" className="size-5" />
-              Guest Houses
+              {t("accommodations.guestHouses")}
             </button>
             <button
               onClick={() => {
@@ -146,7 +148,7 @@ export default function AccommodationsPage() {
               }`}
             >
               <Icon name="place" className="size-5" />
-              Local
+              {t("accommodations.local")}
             </button>
           </div>
         </div>
@@ -157,7 +159,7 @@ export default function AccommodationsPage() {
               key={item.id}
               id={item.id}
               name={item.name}
-              location={item.area || "Djerba"}
+              location={item.area || t("accommodations.detail.areaFallback")}
               price="$150"
               rating={item.rating?.toString() || "4.0"}
               imageUrl={toLocalImageUrl(item.imageUrl, item.name)}
@@ -169,7 +171,7 @@ export default function AccommodationsPage() {
         {filteredAccommodations.length === 0 && (
           <div className="text-center py-20 text-slate-400">
             <Icon name="search_off" className="size-12 mx-auto mb-4" />
-            <p>No accommodations found</p>
+            <p>{t("accommodations.noResults")}</p>
           </div>
         )}
 
@@ -181,7 +183,7 @@ export default function AccommodationsPage() {
               disabled={safeCurrentPage === 1}
               className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Previous
+              {t("accommodations.previous")}
             </button>
 
             {Array.from({ length: totalPages }, (_, index) => {
@@ -210,7 +212,7 @@ export default function AccommodationsPage() {
               disabled={safeCurrentPage === totalPages}
               className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Next
+              {t("accommodations.next")}
             </button>
           </div>
         )}

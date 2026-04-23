@@ -1,6 +1,8 @@
 import { Router } from "express";
 
+import { env } from "../../config/env";
 import prisma from "../../config/prisma";
+import { authenticateAccessToken } from "../../core/middleware/auth.middleware";
 
 const router = Router();
 
@@ -43,6 +45,28 @@ function pickString(record: Record<string, unknown> | null, key: string): string
   return normalized.length > 0 ? normalized : null;
 }
 
+function buildAccommodationImageUrl(imageFileName: string | null): string | null {
+  if (!imageFileName) {
+    return null;
+  }
+
+  const relativeUrl = `/images/accommodations/${imageFileName}`;
+  if (!env.publicBaseUrl) {
+    return relativeUrl;
+  }
+
+  return `${env.publicBaseUrl}${relativeUrl}`;
+}
+
+function extractVibe(interests: string): string | null {
+  const [firstToken] = interests.trim().toLowerCase().split(/\s+/);
+  if (!firstToken) {
+    return null;
+  }
+
+  return ["luxury", "authentic", "beach", "local"].includes(firstToken) ? firstToken : null;
+}
+
 function extractTopPlaces(tripPlan: unknown): string[] {
   const tripPlanRecord = asRecord(tripPlan);
   if (!tripPlanRecord) {
@@ -79,13 +103,21 @@ function extractTopPlaces(tripPlan: unknown): string[] {
   return result;
 }
 
-router.get("/best", async (_req, res, next) => {
+router.get("/best", authenticateAccessToken, async (req, res, next) => {
   try {
-    const rows = await prisma.plannerRequest.findMany({
+    const userId = req.user?.sub;
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const row = await prisma.plannerRequest.findFirst({
+      where: {
+        userId,
+      },
       orderBy: {
         createdAt: "desc",
       },
-      take: 250,
       include: {
         user: {
           select: {
@@ -96,70 +128,41 @@ router.get("/best", async (_req, res, next) => {
           select: {
             name: true,
             area: true,
+            imageFileName: true,
           },
         },
       },
     });
 
-    const candidates = rows
-      .map((row) => {
-        const tripPlanRecord = asRecord(row.tripPlan);
-        const budgetRecord = asRecord(row.budgetBreakdown);
-        const confidence = pickNumber(tripPlanRecord, "confidence");
-        if (confidence === null) {
-          return null;
-        }
-
-        const totalCost = pickNumber(budgetRecord, "total_cost") ?? pickNumber(budgetRecord, "totalCost");
-
-        return {
-          id: row.id,
-          createdAt: row.createdAt,
-          confidence,
-          personality: pickString(tripPlanRecord, "personality"),
-          interests: row.interests,
-          days: row.days,
-          transport: row.transport,
-          budgetLevel: row.budgetLevel,
-          userName: row.user.fullName,
-          accommodationName: row.accommodation.name,
-          accommodationArea: row.accommodation.area,
-          topPlaces: extractTopPlaces(row.tripPlan),
-          estimatedTotalCost: totalCost,
-        };
-      })
-      .filter((row): row is NonNullable<typeof row> => row !== null)
-      .sort((a, b) => {
-        if (b.confidence !== a.confidence) {
-          return b.confidence - a.confidence;
-        }
-
-        return b.createdAt.getTime() - a.createdAt.getTime();
-      });
-
-    const best = candidates[0] ?? null;
-    if (!best) {
+    if (!row) {
       res.json({ recommendation: null });
       return;
     }
 
+    const tripPlanRecord = asRecord(row.tripPlan);
+    const budgetRecord = asRecord(row.budgetBreakdown);
+    const confidence = pickNumber(tripPlanRecord, "confidence") ?? 0;
+    const totalCost = pickNumber(budgetRecord, "total_cost") ?? pickNumber(budgetRecord, "totalCost");
+
     res.json({
       recommendation: {
-        id: best.id,
-        createdAt: best.createdAt,
-        confidence: Number(best.confidence.toFixed(3)),
-        personality: best.personality,
-        interests: best.interests,
-        days: best.days,
-        transport: best.transport,
-        budgetLevel: best.budgetLevel,
-        userName: best.userName,
+        id: row.id,
+        createdAt: row.createdAt,
+        confidence: Number(confidence.toFixed(3)),
+        personality: pickString(tripPlanRecord, "personality"),
+        interests: row.interests,
+        vibe: extractVibe(row.interests),
+        days: row.days,
+        transport: row.transport,
+        budgetLevel: row.budgetLevel,
+        userName: row.user.fullName,
         accommodation: {
-          name: best.accommodationName,
-          area: best.accommodationArea,
+          name: row.accommodation.name,
+          area: row.accommodation.area,
+          imageUrl: buildAccommodationImageUrl(row.accommodation.imageFileName),
         },
-        topPlaces: best.topPlaces,
-        estimatedTotalCost: best.estimatedTotalCost,
+        topPlaces: extractTopPlaces(row.tripPlan),
+        estimatedTotalCost: totalCost,
       },
     });
   } catch (error) {

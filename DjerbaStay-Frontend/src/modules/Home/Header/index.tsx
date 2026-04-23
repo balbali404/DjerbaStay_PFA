@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import Icon from "@/components/Icon";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useAuthSession } from "@/lib/authSession";
+import { useLanguage } from "@/lib/language";
 
 type NavLink = {
   href: string;
@@ -14,9 +16,9 @@ type NavLink = {
 };
 
 const primaryLinks: NavLink[] = [
-  { href: "/", label: "Explore" },
-  { href: "/planner", label: "AI Planner" },
-  { href: "/accommodations", label: "Stays" },
+  { href: "/", label: "header.explore" },
+  { href: "/planner", label: "header.planner" },
+  { href: "/accommodations", label: "header.stays" },
 ];
 
 function getDesktopLinkClass(pathname: string, href: string): string {
@@ -38,6 +40,7 @@ function getMobileLinkClass(pathname: string, href: string): string {
 export default function Header() {
   const pathname = usePathname();
   const { user, isAuthenticated, isInitializing, logout } = useAuthSession();
+  const { t } = useLanguage();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -56,11 +59,11 @@ export default function Header() {
   }
 
   const desktopLinks = isAuthenticated
-    ? [...primaryLinks, { href: "/profile", label: "Profile" }]
+    ? [...primaryLinks, { href: "/profile", label: "header.profile" }]
     : primaryLinks;
 
   const mobileLinks = isAuthenticated
-    ? [...primaryLinks, { href: "/profile", label: "Profile" }]
+    ? [...primaryLinks, { href: "/profile", label: "header.profile" }]
     : primaryLinks;
 
   return (
@@ -78,7 +81,9 @@ export default function Header() {
             />
           </div>
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary/80">Island Guide</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary/80">
+              {t("header.islandGuide")}
+            </p>
             <h2 className="text-2xl font-black leading-none tracking-tight text-[#1C5296]">DjerbaStay</h2>
           </div>
         </Link>
@@ -86,14 +91,18 @@ export default function Header() {
         <nav className="hidden items-center gap-2 lg:flex">
           {desktopLinks.map((link) => (
             <Link key={link.href} className={getDesktopLinkClass(pathname, link.href)} href={link.href}>
-              {link.label}
+              {t(link.label)}
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden md:block">
+            <LanguageSwitcher />
+          </div>
+
           {isInitializing ? (
-            <span className="hidden text-sm font-semibold text-slate-400 sm:inline">Checking session...</span>
+            <span className="hidden text-sm font-semibold text-slate-400 sm:inline">{t("header.checkingSession")}</span>
           ) : isAuthenticated && user ? (
             <>
               <div className="hidden items-center gap-2 lg:flex">
@@ -108,7 +117,7 @@ export default function Header() {
                   disabled={isLoggingOut}
                   className="inline-flex h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isLoggingOut ? "Signing out..." : "Logout"}
+                  {isLoggingOut ? t("header.signingOut") : t("header.logout")}
                 </button>
               </div>
 
@@ -122,13 +131,13 @@ export default function Header() {
                 href="/register"
                 className="inline-flex h-11 min-w-[110px] items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
               >
-                Register
+                {t("header.register")}
               </Link>
               <Link
                 href="/login"
                 className="inline-flex h-11 min-w-[110px] items-center justify-center rounded-full bg-primary px-6 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-colors hover:bg-primary/90"
               >
-                Login
+                {t("header.login")}
               </Link>
             </div>
           )}
@@ -146,24 +155,28 @@ export default function Header() {
 
       {isMenuOpen ? (
         <div className="border-t border-slate-200 bg-white px-4 pb-5 pt-4 lg:hidden">
+          <div className="mb-4">
+            <LanguageSwitcher />
+          </div>
+
           <nav className="grid gap-2">
             {mobileLinks.map((link) => (
               <Link key={link.href} href={link.href} className={getMobileLinkClass(pathname, link.href)}>
-                {link.label}
+                {t(link.label)}
               </Link>
             ))}
           </nav>
 
           <div className="mt-4 border-t border-slate-100 pt-4">
             {isInitializing ? (
-              <p className="text-sm text-slate-400">Checking session...</p>
+              <p className="text-sm text-slate-400">{t("header.checkingSession")}</p>
             ) : isAuthenticated && user ? (
               <div className="space-y-3">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Signed in as</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("header.signedInAs")}</p>
                   <p className="mt-1 text-base font-black text-slate-800">{user.fullName}</p>
                   <span className="mt-2 inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-black text-primary">
-                    {user.plan.code} plan
+                    {user.plan.code} {t("header.plan")}
                   </span>
                 </div>
                 <button
@@ -172,7 +185,7 @@ export default function Header() {
                   className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <Icon name="logout" className="size-4" />
-                  {isLoggingOut ? "Signing out..." : "Logout"}
+                  {isLoggingOut ? t("header.signingOut") : t("header.logout")}
                 </button>
               </div>
             ) : (
@@ -181,13 +194,13 @@ export default function Header() {
                   href="/register"
                   className="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700"
                 >
-                  Register
+                  {t("header.register")}
                 </Link>
                 <Link
                   href="/login"
                   className="inline-flex items-center justify-center rounded-2xl bg-primary px-4 py-3 text-sm font-bold text-white"
                 >
-                  Login
+                  {t("header.login")}
                 </Link>
               </div>
             )}
@@ -202,13 +215,13 @@ export default function Header() {
               href="/register"
               className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700"
             >
-              Register
+              {t("header.register")}
             </Link>
             <Link
               href="/login"
               className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-bold text-white"
             >
-              Login
+              {t("header.login")}
             </Link>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from "react";
 
 import { useAuthSession } from "@/lib/authSession";
 import { fetchCheckoutSessionStatus, ApiError } from "@/lib/backendApi";
+import { useLanguage } from "@/lib/language";
 
 type PaymentStatus = "loading" | "success" | "cancel" | "error";
 
@@ -15,6 +16,7 @@ function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { confirmCheckout, reloadUser } = useAuthSession();
+  const { t } = useLanguage();
 
   const [status, setStatus] = useState<PaymentStatus>("loading");
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -33,7 +35,7 @@ function CheckoutContent() {
 
     if (!sid) {
       setStatus("error");
-      setErrorMsg("No session ID found in URL.");
+      setErrorMsg(t("checkout.missingSession"));
       return;
     }
 
@@ -45,7 +47,7 @@ function CheckoutContent() {
       async function poll() {
         if (polls >= MAX_POLLS) {
           setStatus("error");
-          setErrorMsg("Payment confirmation timed out. Please refresh and try again.");
+          setErrorMsg(t("checkout.timeout"));
           return;
         }
 
@@ -79,12 +81,12 @@ function CheckoutContent() {
           return;
         }
         setStatus("error");
-        setErrorMsg(err instanceof Error ? err.message : "Payment confirmation failed");
+        setErrorMsg(err instanceof Error ? err.message : t("checkout.error"));
       });
     }
 
     pollAndConfirm();
-  }, [searchParams, confirmCheckout, reloadUser]);
+  }, [searchParams, confirmCheckout, reloadUser, t]);
 
   function goHome() {
     router.push("/");
@@ -116,7 +118,8 @@ function CheckoutContent() {
               </div>
               <div>
                 <h1 className="text-3xl font-extrabold text-slate-900">Processing Payment</h1>
-                <p className="mt-2 text-slate-500">Please wait while we confirm your payment...</p>
+                <h1 className="text-3xl font-extrabold text-slate-900">{t("checkout.processingTitle")}</h1>
+                <p className="mt-2 text-slate-500">{t("checkout.processingBody")}</p>
               </div>
             </div>
           )}
@@ -129,19 +132,19 @@ function CheckoutContent() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-3xl font-extrabold text-slate-900">Payment Successful!</h1>
+                <h1 className="text-3xl font-extrabold text-slate-900">{t("checkout.successTitle")}</h1>
                 <p className="mt-2 text-slate-500">
-                  You are now on the <span className="font-bold text-primary">{purchasedPlan || "PREMIUM"}</span> plan. Enjoy your new benefits!
+                  {t("checkout.successBody", { plan: purchasedPlan || "PREMIUM" })}
                 </p>
               </div>
               <button
                 onClick={goPlanner}
                 className="w-full rounded-xl bg-primary px-4 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
               >
-                Start Planning
+                {t("checkout.startPlanning")}
               </button>
               <button onClick={goHome} className="text-sm text-slate-500 hover:text-primary transition-colors">
-                Back to Home
+                {t("checkout.backHome")}
               </button>
             </div>
           )}
@@ -154,19 +157,19 @@ function CheckoutContent() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-3xl font-extrabold text-slate-900">Payment Cancelled</h1>
+                <h1 className="text-3xl font-extrabold text-slate-900">{t("checkout.cancelTitle")}</h1>
                 <p className="mt-2 text-slate-500">
-                  Your payment was cancelled. No charge was made. You can upgrade to Premium anytime.
+                  {t("checkout.cancelBody")}
                 </p>
               </div>
               <button
                 onClick={tryAgain}
                 className="w-full rounded-xl bg-primary px-4 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
               >
-                Choose a Plan
+                {t("checkout.choosePlan")}
               </button>
               <button onClick={goHome} className="text-sm text-slate-500 hover:text-primary transition-colors">
-                Back to Home
+                {t("checkout.backHome")}
               </button>
             </div>
           )}
@@ -179,24 +182,24 @@ function CheckoutContent() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-3xl font-extrabold text-slate-900">Payment Error</h1>
-                <p className="mt-2 text-slate-500">{errorMsg || "Something went wrong. Please try again."}</p>
+                <h1 className="text-3xl font-extrabold text-slate-900">{t("checkout.errorTitle")}</h1>
+                <p className="mt-2 text-slate-500">{errorMsg || t("checkout.genericError")}</p>
               </div>
               <button
                 onClick={tryAgain}
                 className="w-full rounded-xl bg-primary px-4 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
               >
-                Try Again
+                {t("checkout.tryAgain")}
               </button>
               <button onClick={goHome} className="text-sm text-slate-500 hover:text-primary transition-colors">
-                Back to Home
+                {t("checkout.backHome")}
               </button>
             </div>
           )}
 
           {sessionId && (
             <p className="mt-6 text-center text-xs text-slate-400">
-              Session: {sessionId.slice(0, 20)}...
+              {t("checkout.session", { id: sessionId.slice(0, 20) })}
             </p>
           )}
         </div>
@@ -206,8 +209,12 @@ function CheckoutContent() {
 }
 
 export default function CheckoutPage() {
+  const fallback = (
+    <div className="px-6 py-14 text-center text-slate-500">Loading checkout...</div>
+  );
+
   return (
-    <Suspense fallback={<div className="px-6 py-14 text-center text-slate-500">Loading checkout...</div>}>
+    <Suspense fallback={fallback}>
       <CheckoutContent />
     </Suspense>
   );

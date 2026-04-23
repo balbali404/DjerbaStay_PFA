@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useAuthSession } from "@/lib/authSession";
+import { useLanguage } from "@/lib/language";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isInitializing, updateProfile } = useAuthSession();
+  const { t } = useLanguage();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -40,12 +42,12 @@ export default function ProfilePage() {
       });
       setCurrentPassword("");
       setNewPassword("");
-      setSuccess("Profile updated successfully.");
+      setSuccess(t("profile.success"));
     } catch (updateError) {
       if (updateError instanceof Error) {
         setError(updateError.message);
       } else {
-        setError("Failed to update profile.");
+        setError(t("profile.fallbackError"));
       }
     } finally {
       setIsSaving(false);
@@ -53,20 +55,20 @@ export default function ProfilePage() {
   }
 
   if (isInitializing) {
-    return <div className="px-6 py-16 text-center text-slate-500">Checking session...</div>;
+    return <div className="px-6 py-16 text-center text-slate-500">{t("profile.checking")}</div>;
   }
 
   if (!isAuthenticated || !user) {
     return (
       <div className="mx-auto max-w-2xl px-6 py-16">
         <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-          <h1 className="text-3xl font-bold text-slate-900">Login Required</h1>
-          <p className="mt-3 text-slate-600">Please login to access your profile settings.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("profile.loginRequired")}</h1>
+          <p className="mt-3 text-slate-600">{t("profile.loginRequiredBody")}</p>
           <Link
             href="/login"
             className="mt-6 inline-flex rounded-full bg-primary px-6 py-3 text-sm font-bold text-white"
           >
-            Go to Login
+            {t("profile.goToLogin")}
           </Link>
         </div>
       </div>
@@ -76,15 +78,15 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-8 px-6 py-12 lg:grid-cols-[1.6fr_1fr]">
       <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">Edit Profile</h1>
+        <h1 className="text-3xl font-bold text-slate-900">{t("profile.title")}</h1>
         <p className="mt-2 text-sm text-slate-500">
-          Update your account details and change your password if needed.
+          {t("profile.subtitle")}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-600" htmlFor="profileFullName">
-              Full Name
+              {t("profile.fullName")}
             </label>
             <input
               id="profileFullName"
@@ -92,14 +94,14 @@ export default function ProfilePage() {
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="Your full name"
+              placeholder={t("profile.namePlaceholder")}
               required
             />
           </div>
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-600" htmlFor="profileEmail">
-              Email
+              {t("profile.email")}
             </label>
             <input
               id="profileEmail"
@@ -107,14 +109,14 @@ export default function ProfilePage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="you@example.com"
+              placeholder={t("profile.emailPlaceholder")}
               required
             />
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Change Password (optional)
+              {t("profile.passwordSection")}
             </p>
             <div className="space-y-4">
               <div>
@@ -122,7 +124,7 @@ export default function ProfilePage() {
                   className="mb-2 block text-sm font-semibold text-slate-600"
                   htmlFor="profileCurrentPassword"
                 >
-                  Current Password
+                  {t("profile.currentPassword")}
                 </label>
                 <input
                   id="profileCurrentPassword"
@@ -130,13 +132,13 @@ export default function ProfilePage() {
                   value={currentPassword}
                   onChange={(event) => setCurrentPassword(event.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  placeholder="Current password"
+                  placeholder={t("profile.currentPasswordPlaceholder")}
                 />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-600" htmlFor="profileNewPassword">
-                  New Password
+                  {t("profile.newPassword")}
                 </label>
                 <input
                   id="profileNewPassword"
@@ -144,7 +146,7 @@ export default function ProfilePage() {
                   value={newPassword}
                   onChange={(event) => setNewPassword(event.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  placeholder="At least 8 characters"
+                  placeholder={t("profile.newPasswordPlaceholder")}
                   minLength={8}
                 />
               </div>
@@ -167,39 +169,39 @@ export default function ProfilePage() {
             type="submit"
             disabled={isSaving}
             className="w-full rounded-xl bg-primary px-4 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
+        >
+            {isSaving ? t("profile.saving") : t("profile.saveChanges")}
           </button>
         </form>
       </section>
 
       <aside className="space-y-6">
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Current Plan</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("profile.currentPlan")}</p>
           <div className="mt-3 inline-flex rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
             {user.plan.code}
           </div>
           <p className="mt-3 text-sm text-slate-600">
             {user.plan.monthlyMlRequests === null
-              ? "Unlimited AI requests per month"
-              : `${user.plan.monthlyMlRequests} AI requests per month`}
+              ? t("profile.unlimited")
+              : t("profile.requestsPerMonth", { count: user.plan.monthlyMlRequests })}
           </p>
         </div>
 
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold text-slate-900">Quick Actions</p>
+          <p className="text-sm font-semibold text-slate-900">{t("profile.quickActions")}</p>
           <div className="mt-4 space-y-3">
             <Link
               href="/planner"
               className="flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
             >
-              Open Planner
+              {t("profile.openPlanner")}
             </Link>
             <Link
               href="/#pricing"
               className="flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
             >
-              Manage Plan
+              {t("profile.managePlan")}
             </Link>
           </div>
         </div>
