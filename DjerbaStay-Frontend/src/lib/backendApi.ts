@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "https://djerbastay-pfa-backend.onrender.com";
 const ACCESS_TOKEN_STORAGE_KEY = "djerbastay_access_token";
 
 type ApiRequestOptions = {
