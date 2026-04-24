@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-import { Prisma, SubscriptionCode } from "@prisma/client";
+import { Prisma, Role, SubscriptionCode } from "@prisma/client";
 import type { CookieOptions, Request, Response } from "express";
 
 import { env } from "../../config/env";
@@ -22,6 +22,7 @@ export type SafeUser = {
   fullName: string;
   email: string;
   language: string;
+  role: Role;
   plan: {
     code: SubscriptionCode;
     name: string;
@@ -36,6 +37,7 @@ export function asSafeUser(user: UserWithPlan): SafeUser {
     fullName: user.fullName,
     email: user.email,
     language: user.language,
+    role: user.role,
     plan: {
       code: user.plan.code,
       name: user.plan.name,
@@ -76,6 +78,7 @@ export async function issueAuthSession(user: UserWithPlan, res: Response): Promi
     sub: user.id,
     email: user.email,
     plan: user.plan.code,
+    role: user.role,
   };
 
   const accessToken = createAccessToken(payload);

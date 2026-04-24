@@ -1,4 +1,4 @@
-import { SubscriptionCode, TransportMode } from "@prisma/client";
+import { HotelStatus, SubscriptionCode, TransportMode } from "@prisma/client";
 import { z } from "zod";
 
 const emailSchema = z.string().trim().email().max(255);
@@ -69,8 +69,26 @@ export const plannerGenerationSchema = z.object({
   persons: z.number().int().min(1).max(10),
   budgetLevel: z.number().int().min(1).max(3),
   transport: z.nativeEnum(TransportMode),
+  travelStartDate: z.string().datetime().optional(),
 });
 
 export const confirmStripeCheckoutSchema = z.object({
   sessionId: z.string().trim().min(1).max(255),
 });
+
+// ─── Hotel Admin schemas ───────────────────────────────────────────────────
+
+export const hotelStatusUpdateSchema = z.object({
+  status: z.nativeEnum(HotelStatus),
+});
+
+export const createAvailabilitySchema = z
+  .object({
+    startDate: z.string().datetime({ message: "startDate must be a valid ISO 8601 datetime" }),
+    endDate: z.string().datetime({ message: "endDate must be a valid ISO 8601 datetime" }),
+    reason: z.string().trim().max(500).optional(),
+  })
+  .refine((data) => new Date(data.startDate) < new Date(data.endDate), {
+    message: "startDate must be before endDate",
+    path: ["endDate"],
+  });

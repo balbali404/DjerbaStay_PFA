@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { Role } from "@prisma/client";
 
 import prisma from "../../config/prisma";
 import { authenticateAccessToken } from "../../core/middleware/auth.middleware";
@@ -18,6 +19,17 @@ router.get("/usage", authenticateAccessToken, async (req, res, next) => {
     const user = await loadAuthenticatedUser(userId);
     if (!user) {
       res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    // Hotel admins (HOTEL_ADMIN) have unlimited access and should not see plan usage
+    if (user.role === Role.HOTEL_ADMIN) {
+      res.json({
+        planCode: "UNLIMITED",
+        used: null,
+        limit: null,
+        remaining: null,
+      });
       return;
     }
 

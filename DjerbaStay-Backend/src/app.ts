@@ -10,6 +10,8 @@ import billingRouter from "./modules/billing/billing.routes";
 import catalogRouter from "./modules/catalog/catalog.routes";
 import datasetsRouter from "./modules/datasets/datasets.routes";
 import healthRouter from "./modules/health/health.routes";
+import hotelAdminRouter from "./modules/hotel-admin/hotel-admin.routes";
+import hotelReservationsRouter from "./modules/hotel-reservations/hotel-reservations.routes";
 import mlRouter from "./modules/ml/ml.routes";
 import plannerRouter from "./modules/planner/planner.routes";
 import recommendationsRouter from "./modules/recommendations/recommendations.routes";
@@ -38,6 +40,8 @@ app.use("/api", catalogRouter);
 app.use("/api/datasets", datasetsRouter);
 app.use("/api/recommendations", recommendationsRouter);
 app.use("/api/planner", plannerRouter);
+app.use("/api/hotel", hotelAdminRouter);
+app.use("/api/hotel-reservations", hotelReservationsRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ error: "Route not found" });

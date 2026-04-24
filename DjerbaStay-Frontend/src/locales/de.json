@@ -25,6 +25,7 @@
     "register": "Registrieren",
     "login": "Anmelden",
     "signedInAs": "Angemeldet als",
-    "plan": "Tarif"
+    "plan": "Tarif",
+    "dashboard": "Dashboard"
   }
 }

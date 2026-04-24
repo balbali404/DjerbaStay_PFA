@@ -39,10 +39,10 @@ export default function Footer() {
         <div>
           <h4 className="mb-6 font-bold">{t("home.footer.support")}</h4>
           <ul className="space-y-4 text-sm text-slate-500">
-            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.helpCenter")}</Link></li>
-            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.safetyInfo")}</Link></li>
-            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.partnerProgram")}</Link></li>
-            <li><Link className="transition-colors hover:text-primary" href="#">{t("home.footer.privacyPolicy")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="/help-center">{t("home.footer.helpCenter")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="/safety">{t("home.footer.safetyInfo")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="/partner-program">{t("home.footer.partnerProgram")}</Link></li>
+            <li><Link className="transition-colors hover:text-primary" href="/privacy-policy">{t("home.footer.privacyPolicy")}</Link></li>
           </ul>
         </div>
         <div>
@@ -63,8 +63,8 @@ export default function Footer() {
       <div className="mt-20 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-8 text-xs font-medium text-slate-400 md:flex-row">
         <p>{t("home.footer.rights")}</p>
         <div className="flex gap-6">
-          <Link href="#">{t("home.footer.terms")}</Link>
-          <Link href="#">{t("home.footer.cookies")}</Link>
+          <Link href="/privacy-policy">{t("home.footer.terms")}</Link>
+          <Link href="/privacy-policy#cookies">{t("home.footer.cookies")}</Link>
         </div>
       </div>
     </footer>

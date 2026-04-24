@@ -23,11 +23,14 @@ export default function LoginPage() {
 
     try {
       setIsSubmitting(true);
-      await login({
-        email,
-        password,
-      });
-      router.push("/");
+      const session = await login({ email, password });
+
+      // Redirect based on role
+      if (session.user.role === "HOTEL_ADMIN" || session.user.role === "SUPER_ADMIN") {
+        router.push("/dashboard");
+      } else {
+        router.push("/");
+      }
     } catch (submissionError) {
       if (submissionError instanceof Error) {
         setError(submissionError.message);

@@ -58,12 +58,22 @@ export default function Header() {
     }
   }
 
+  const isPartner = user?.role === "HOTEL_ADMIN" || user?.role === "SUPER_ADMIN";
+
   const desktopLinks = isAuthenticated
-    ? [...primaryLinks, { href: "/profile", label: "header.profile" }]
+    ? [
+        ...primaryLinks,
+        ...(isPartner ? [{ href: "/dashboard", label: "header.dashboard" }] : []),
+        { href: "/profile", label: "header.profile" },
+      ]
     : primaryLinks;
 
   const mobileLinks = isAuthenticated
-    ? [...primaryLinks, { href: "/profile", label: "header.profile" }]
+    ? [
+        ...primaryLinks,
+        ...(isPartner ? [{ href: "/dashboard", label: "header.dashboard" }] : []),
+        { href: "/profile", label: "header.profile" },
+      ]
     : primaryLinks;
 
   return (
@@ -110,7 +120,7 @@ export default function Header() {
                   {user.fullName}
                 </span>
                 <span className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-black text-primary">
-                  {user.plan.code}
+                  {isPartner ? "Partner" : user.plan.code}
                 </span>
                 <button
                   onClick={logoutUser}
@@ -122,7 +132,7 @@ export default function Header() {
               </div>
 
               <span className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-black text-primary lg:hidden">
-                {user.plan.code}
+                {isPartner ? "Partner" : user.plan.code}
               </span>
             </>
           ) : (
@@ -176,7 +186,7 @@ export default function Header() {
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("header.signedInAs")}</p>
                   <p className="mt-1 text-base font-black text-slate-800">{user.fullName}</p>
                   <span className="mt-2 inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-black text-primary">
-                    {user.plan.code} {t("header.plan")}
+                    {isPartner ? "Partner" : `${user.plan.code} ${t("header.plan")}`}
                   </span>
                 </div>
                 <button

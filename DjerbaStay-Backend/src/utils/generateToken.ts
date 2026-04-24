@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
+import { Role } from "@prisma/client";
 import type { AccessTokenPayload } from "../core/middleware/auth.middleware";
 
 function requiredEnv(name: string): string {
@@ -44,6 +45,8 @@ export function verifyRefreshToken(token: string): AccessTokenPayload {
     sub: decoded.sub,
     email: decoded.email,
     plan: decoded.plan as AccessTokenPayload["plan"],
+    // Backward compat: tokens issued before RBAC default to CLIENT
+    role: (decoded.role as Role) ?? Role.CLIENT,
   };
 }
 

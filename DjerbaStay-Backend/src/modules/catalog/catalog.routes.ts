@@ -1,3 +1,4 @@
+import { HotelStatus } from "@prisma/client";
 import { Router } from "express";
 
 import { env } from "../../config/env";
@@ -22,8 +23,52 @@ function buildPublicImageUrl(basePath: string, imageFileName: string | null): st
   return `${env.publicBaseUrl}${relativeUrl}`;
 }
 
-router.get("/accommodations", async (_req, res) => {
+/**
+ * GET /api/accommodations
+ *
+ * Optional query params for availability filtering:
+ *   startDate  ISO datetime — start of the desired travel period
+ *   days       integer      — trip duration in days
+ *
+ * Always excludes INACTIVE hotels.
+ * When dates are provided, also excludes hotels that have an inactive period
+ * overlapping [startDate, startDate + days).
+ */
+router.get("/accommodations", async (req, res) => {
+  // Build the date range filter if both params are present
+  let dateFilter: { startDate: Date; endDate: Date } | null = null;
+
+  const rawStartDate = req.query.startDate;
+  const rawDays = req.query.days;
+
+  if (typeof rawStartDate === "string" && typeof rawDays === "string") {
+    const start = new Date(rawStartDate);
+    const daysNum = parseInt(rawDays, 10);
+
+    if (!isNaN(start.getTime()) && Number.isFinite(daysNum) && daysNum > 0) {
+      const end = new Date(start);
+      end.setDate(end.getDate() + daysNum);
+      dateFilter = { startDate: start, endDate: end };
+    }
+  }
+
   const accommodations = await prisma.accommodation.findMany({
+    where: {
+      status: HotelStatus.ACTIVE,
+      // Exclude hotels with inactive periods overlapping the requested travel window
+      ...(dateFilter
+        ? {
+            NOT: {
+              availabilities: {
+                some: {
+                  startDate: { lte: dateFilter.endDate },
+                  endDate: { gte: dateFilter.startDate },
+                },
+              },
+            },
+          }
+        : {}),
+    },
     orderBy: {
       externalId: "asc",
     },
@@ -41,6 +86,7 @@ router.get("/accommodations", async (_req, res) => {
       latitude: item.latitude,
       longitude: item.longitude,
       rating: item.rating,
+      status: item.status,
     }))
   );
 });

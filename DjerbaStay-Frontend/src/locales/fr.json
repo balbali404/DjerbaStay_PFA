@@ -25,6 +25,7 @@
     "register": "S'inscrire",
     "login": "Connexion",
     "signedInAs": "Connecte en tant que",
-    "plan": "offre"
+    "plan": "offre",
+    "dashboard": "Tableau de bord"
   }
 }

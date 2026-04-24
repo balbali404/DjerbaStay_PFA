@@ -25,7 +25,8 @@
     "register": "Register",
     "login": "Login",
     "signedInAs": "Signed in as",
-    "plan": "plan"
+    "plan": "plan",
+    "dashboard": "Dashboard"
   },
   "hero": {
     "badge": "Welcome to the Island of Dreams",
@@ -98,6 +99,8 @@
           "{{requests}} AI requests/month",
           "Advanced budget estimation",
           "Personalized recommendations",
+          "Hotel reservation included — we book for you",
+          "All activities pre-booked for you",
           "Email support"
         ]
       },
@@ -110,6 +113,7 @@
           "Priority customer support",
           "Custom itinerary export",
           "Exclusive premium spots",
+          "Personal guide from first to last day of your trip",
           "Early access to new features"
         ]
       }

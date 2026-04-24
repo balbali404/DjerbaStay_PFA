@@ -24,12 +24,15 @@ import {
   updateProfileAccount,
   type CheckoutConfirmation,
   type CheckoutSession,
+  type AuthSession,
   type AuthUser,
   type LanguageCode,
   type SubscriptionCode,
   type SubscriptionPlan,
   type UpdateProfilePayload,
 } from "./authApi";
+
+export type { AuthSession, AuthUser, LanguageCode, SubscriptionCode };
 
 type LoginPayload = {
   email: string;
@@ -47,8 +50,8 @@ type AuthSessionContextValue = {
   plans: SubscriptionPlan[];
   isAuthenticated: boolean;
   isInitializing: boolean;
-  login: (payload: LoginPayload) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  login: (payload: LoginPayload) => Promise<AuthSession>;
+  register: (payload: RegisterPayload) => Promise<AuthSession>;
   logout: () => Promise<void>;
   reloadUser: () => Promise<void>;
   updateLanguage: (language: LanguageCode) => Promise<void>;
@@ -118,14 +121,17 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = useCallback(async (payload: LoginPayload) => {
+  // Returns the full AuthSession so callers can redirect based on role
+  const login = useCallback(async (payload: LoginPayload): Promise<AuthSession> => {
     const session = await loginAccount(payload);
     setUser(session.user);
+    return session;
   }, []);
 
-  const register = useCallback(async (payload: RegisterPayload) => {
+  const register = useCallback(async (payload: RegisterPayload): Promise<AuthSession> => {
     const session = await registerAccount(payload);
     setUser(session.user);
+    return session;
   }, []);
 
   const logout = useCallback(async () => {

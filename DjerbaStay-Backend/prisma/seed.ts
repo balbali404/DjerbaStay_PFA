@@ -4,7 +4,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, SubscriptionCode, TransportMode } from "@prisma/client";
+import { PrismaClient, Role, SubscriptionCode, TransportMode } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import { parse } from "csv-parse/sync";
 import pg from "pg";
 
@@ -119,7 +120,7 @@ function parseOptionalString(value: string): string | null {
 function slugify(value: string): string {
   return value
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
@@ -471,6 +472,77 @@ async function seedTripBudgetSamples(): Promise<void> {
   }
 }
 
+/**
+ * Seeds the Radisson Blu Palace Resort & Thalasso hotel admin account.
+ *
+ * Credentials:
+ *   Email:    admin@radissonblu-djerba.tn
+ *   Password: RadissonAdmin2024!
+ *
+ * Idempotent — safe to run multiple times.
+ */
+async function seedHotelAdmin(): Promise<void> {
+  const RADISSON_EXTERNAL_ID = 2114393;
+  const ADMIN_EMAIL = "admin@radissonblu-djerba.tn";
+  const ADMIN_PASSWORD = "RadissonAdmin2024!";
+  const ADMIN_FULL_NAME = "Radisson Blu Admin";
+
+  // Locate the hotel record (must exist — run after seedAccommodations)
+  const hotel = await prisma.accommodation.findUnique({
+    where: { externalId: RADISSON_EXTERNAL_ID },
+  });
+
+  if (!hotel) {
+    console.warn(
+      `[seed] Radisson Blu (externalId ${RADISSON_EXTERNAL_ID}) not found — skipping hotel admin seed.`
+    );
+    return;
+  }
+
+  // Ensure FREE plan exists
+  const freePlan = await prisma.subscriptionPlan.findUnique({
+    where: { code: SubscriptionCode.FREE },
+  });
+
+  if (!freePlan) {
+    throw new Error("[seed] FREE plan missing — run seedSubscriptionPlans first.");
+  }
+
+  const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+
+  // Create or update the hotel admin user
+  const adminUser = await prisma.user.upsert({
+    where: { email: ADMIN_EMAIL },
+    update: {
+      fullName: ADMIN_FULL_NAME,
+      role: Role.HOTEL_ADMIN,
+      passwordHash,
+    },
+    create: {
+      fullName: ADMIN_FULL_NAME,
+      email: ADMIN_EMAIL,
+      passwordHash,
+      role: Role.HOTEL_ADMIN,
+      planId: freePlan.id,
+    },
+  });
+
+  // Link the hotel to this admin (only if not already claimed)
+  if (hotel.adminUserId === null || hotel.adminUserId === adminUser.id) {
+    await prisma.accommodation.update({
+      where: { id: hotel.id },
+      data: { adminUserId: adminUser.id },
+    });
+  } else {
+    console.warn(
+      `[seed] Radisson Blu is already claimed by a different admin (${hotel.adminUserId}) — skipping link.`
+    );
+  }
+
+  console.log(`[seed] Hotel admin seeded → ${ADMIN_EMAIL} (id: ${adminUser.id})`);
+  console.log(`[seed]   Hotel: ${hotel.name} (externalId: ${RADISSON_EXTERNAL_ID})`);
+}
+
 async function run(): Promise<void> {
   await seedSubscriptionPlans();
   await seedAccommodations();
@@ -479,17 +551,18 @@ async function run(): Promise<void> {
   await seedTravelerProfiles();
   await seedSynonyms();
   await seedTripBudgetSamples();
+  await seedHotelAdmin();
 
   const [planCount, accCount, placeCount, restaurantCount, profileCount, synonymCount, tripBudgetCount] =
     await Promise.all([
-    prisma.subscriptionPlan.count(),
-    prisma.accommodation.count(),
-    prisma.place.count(),
-    prisma.restaurant.count(),
-    prisma.travelerProfile.count(),
-    prisma.synonym.count(),
-    prisma.tripBudgetSample.count(),
-  ]);
+      prisma.subscriptionPlan.count(),
+      prisma.accommodation.count(),
+      prisma.place.count(),
+      prisma.restaurant.count(),
+      prisma.travelerProfile.count(),
+      prisma.synonym.count(),
+      prisma.tripBudgetSample.count(),
+    ]);
 
   console.log(
     `Seed complete: ${planCount} plans, ${accCount} accommodations, ${placeCount} places, ${restaurantCount} restaurants, ${profileCount} traveler profiles, ${synonymCount} synonyms, ${tripBudgetCount} trip budget samples`

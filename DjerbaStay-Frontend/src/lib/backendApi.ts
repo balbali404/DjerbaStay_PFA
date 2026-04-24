@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "https://djerbastay-pfa-backend.onrender.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:4000";
 const ACCESS_TOKEN_STORAGE_KEY = "djerbastay_access_token";
 
 type ApiRequestOptions = {
@@ -23,15 +23,18 @@ export class ApiError extends Error {
   }
 }
 
-export type SubscriptionCode = "FREE" | "PLUS" | "PREMIUM";
+export type SubscriptionCode = "FREE" | "PLUS" | "PREMIUM" | "UNLIMITED";
 export type TransportMode = "taxi" | "car_rental" | "bus";
 export type LanguageCode = "en" | "fr" | "de";
+export type Role = "CLIENT" | "HOTEL_ADMIN" | "SUPER_ADMIN";
+export type HotelStatus = "ACTIVE" | "INACTIVE";
 
 export type AuthUser = {
   id: string;
   fullName: string;
   email: string;
   language: LanguageCode;
+  role: Role;
   plan: {
     code: SubscriptionCode;
     name: string;
@@ -92,6 +95,7 @@ export type Accommodation = {
   latitude: number;
   longitude: number;
   rating?: number | null;
+  status?: HotelStatus;
 };
 
 export type TripPlace = {
@@ -142,6 +146,7 @@ export type GeneratePlannerPayload = {
   persons: number;
   budgetLevel: number;
   transport: TransportMode;
+  travelStartDate?: string;
 };
 
 export type PlannerGenerationResponse = {
@@ -159,6 +164,7 @@ export type PlannerRequestDetails = {
   persons: number;
   budgetLevel: number;
   transport: TransportMode;
+  travelStartDate?: string | null;
   accommodation: {
     id: number;
     name: string;
@@ -204,6 +210,81 @@ export type BestRecommendation = {
   topPlaces: string[];
   estimatedTotalCost: number | null;
 };
+
+// ─── Hotel Admin Types ────────────────────────────────────────────────────────
+
+export type HotelAvailabilityPeriod = {
+  id: string;
+  startDate: string;
+  endDate: string;
+  reason?: string | null;
+  createdAt: string;
+};
+
+export type HotelInfo = {
+  id: number;
+  dbId: string;
+  name: string;
+  type?: string | null;
+  area?: string | null;
+  rating?: number | null;
+  priceEuro?: number | null;
+  status: HotelStatus;
+};
+
+export type HotelDashboardStats = {
+  hotel: HotelInfo;
+  stats: {
+    totalReservations: number;
+    thisMonthReservations: number;
+    upcomingInactivePeriods: number;
+  };
+};
+
+export type HotelReservation = {
+  id: string;
+  createdAt: string;
+  interests: string;
+  days: number;
+  persons: number;
+  budgetLevel: number;
+  transport: TransportMode;
+  travelStartDate?: string | null;
+  approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
+  approvalNotes?: string | null;
+  approvedAt?: string | null;
+  rejectedAt?: string | null;
+  user: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+  tripPlan: TripPlanResponse;
+  budget: BudgetResponse;
+};
+
+export type HotelReservationsResponse = {
+  data: HotelReservation[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type HotelMlResult = {
+  id: string;
+  createdAt: string;
+  interests: string;
+  days: number;
+  travelStartDate?: string | null;
+  user: {
+    fullName: string;
+    email: string;
+  };
+  tripPlan: TripPlanResponse;
+  budget: BudgetResponse;
+};
+
+// ─── Token storage ────────────────────────────────────────────────────────────
 
 let inMemoryAccessToken: string | null = null;
 let refreshInFlight: Promise<string | null> | null = null;
@@ -251,6 +332,8 @@ export function getAccessToken(): string | null {
 export function clearAuthSession(): void {
   persistAccessToken(null);
 }
+
+// ─── Request helpers ──────────────────────────────────────────────────────────
 
 function buildError(payload: unknown, status: number): ApiError {
   const fallbackMessage = `Request failed with status ${status}`;
@@ -373,6 +456,8 @@ function storeSessionAndReturn(session: AuthSession): AuthSession {
   persistAccessToken(session.accessToken);
   return session;
 }
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export async function registerUser(payload: {
   fullName: string;
@@ -537,8 +622,15 @@ export async function fetchMlUsage(): Promise<MlUsage> {
   return requestJson<MlUsage>("/api/ml/usage", {}, { requiresAuth: true });
 }
 
-export async function fetchAccommodations(): Promise<Accommodation[]> {
-  return requestJson<Accommodation[]>("/api/accommodations", {}, { requiresAuth: false });
+export async function fetchAccommodations(params?: {
+  startDate?: string;
+  days?: number;
+}): Promise<Accommodation[]> {
+  const qs = new URLSearchParams();
+  if (params?.startDate) qs.set("startDate", params.startDate);
+  if (params?.days) qs.set("days", String(params.days));
+  const query = qs.toString() ? `?${qs.toString()}` : "";
+  return requestJson<Accommodation[]>(`/api/accommodations${query}`, {}, { requiresAuth: false });
 }
 
 export async function generatePlannerRequest(
@@ -562,4 +654,170 @@ export async function fetchPlannerHistory(limit = 10): Promise<PlannerHistoryIte
 
 export async function fetchPlannerRequestById(requestId: string): Promise<PlannerRequestDetails> {
   return requestJson<PlannerRequestDetails>(`/api/planner/${requestId}`, {}, { requiresAuth: true });
+}
+
+// ─── Hotel Admin API ──────────────────────────────────────────────────────────
+
+export async function claimHotel(externalId: number): Promise<{ message: string; hotel: HotelInfo }> {
+  return requestJson(
+    `/api/hotel/claim/${externalId}`,
+    { method: "PATCH" },
+    { requiresAuth: true }
+  );
+}
+
+export async function fetchHotelDashboard(): Promise<HotelDashboardStats> {
+  return requestJson<HotelDashboardStats>("/api/hotel/dashboard", {}, { requiresAuth: true });
+}
+
+export async function updateHotelStatus(status: HotelStatus): Promise<{ status: HotelStatus }> {
+  return requestJson<{ status: HotelStatus }>(
+    "/api/hotel/status",
+    { method: "PATCH", body: JSON.stringify({ status }) },
+    { requiresAuth: true }
+  );
+}
+
+export async function fetchHotelAvailabilities(): Promise<HotelAvailabilityPeriod[]> {
+  return requestJson<HotelAvailabilityPeriod[]>("/api/hotel/availability", {}, { requiresAuth: true });
+}
+
+export async function createHotelAvailability(payload: {
+  startDate: string;
+  endDate: string;
+  reason?: string;
+}): Promise<HotelAvailabilityPeriod> {
+  return requestJson<HotelAvailabilityPeriod>(
+    "/api/hotel/availability",
+    { method: "POST", body: JSON.stringify(payload) },
+    { requiresAuth: true }
+  );
+}
+
+export async function deleteHotelAvailability(id: string): Promise<void> {
+  await requestJson<{ message: string }>(
+    `/api/hotel/availability/${id}`,
+    { method: "DELETE" },
+    { requiresAuth: true }
+  );
+}
+
+export async function fetchHotelReservations(params?: {
+  limit?: number;
+  page?: number;
+}): Promise<HotelReservationsResponse> {
+  const qs = new URLSearchParams();
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.page) qs.set("page", String(params.page));
+  return requestJson<HotelReservationsResponse>(
+    `/api/hotel/reservations?${qs.toString()}`,
+    {},
+    { requiresAuth: true }
+  );
+}
+
+export async function fetchHotelMlResults(params?: {
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+}): Promise<HotelMlResult[]> {
+  const qs = new URLSearchParams();
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.startDate) qs.set("startDate", params.startDate);
+  if (params?.endDate) qs.set("endDate", params.endDate);
+  return requestJson<HotelMlResult[]>(
+    `/api/hotel/ml-results?${qs.toString()}`,
+    {},
+    { requiresAuth: true }
+  );
+}
+
+// ─── Hotel Reservations (Approval Workflow) ───────────────────────────────────
+
+export async function fetchHotelPendingReservations(params?: {
+  limit?: number;
+  page?: number;
+}): Promise<HotelReservationsResponse> {
+  const qs = new URLSearchParams();
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.page) qs.set("page", String(params.page));
+  return requestJson<HotelReservationsResponse>(
+    `/api/hotel-reservations/pending?${qs.toString()}`,
+    {},
+    { requiresAuth: true }
+  );
+}
+
+export async function fetchReservationDetails(requestId: string): Promise<HotelReservation> {
+  return requestJson<HotelReservation>(
+    `/api/hotel-reservations/${requestId}`,
+    {},
+    { requiresAuth: true }
+  );
+}
+
+export async function approveReservation(requestId: string, notes?: string): Promise<{
+  message: string;
+  reservation: { id: string; approvalStatus: string; approvalNotes?: string; approvedAt: string };
+}> {
+  return requestJson(
+    `/api/hotel-reservations/${requestId}/approve`,
+    { method: "POST", body: JSON.stringify({ notes }) },
+    { requiresAuth: true }
+  );
+}
+
+export async function rejectReservation(requestId: string, reason?: string): Promise<{
+  message: string;
+  reservation: { id: string; approvalStatus: string; approvalNotes?: string; rejectedAt: string };
+}> {
+  return requestJson(
+    `/api/hotel-reservations/${requestId}/reject`,
+    { method: "POST", body: JSON.stringify({ reason }) },
+    { requiresAuth: true }
+  );
+}
+
+// ─── Hotel Guides ─────────────────────────────────────────────────────────────
+
+export type HotelGuide = {
+  id: string;
+  name: string;
+  specialty?: string | null;
+  phone?: string | null;
+  isAvailable: boolean;
+  createdAt: string;
+};
+
+export async function fetchHotelGuides(): Promise<HotelGuide[]> {
+  return requestJson<HotelGuide[]>("/api/hotel/guides", {}, { requiresAuth: true });
+}
+
+export async function createHotelGuide(payload: {
+  name: string;
+  specialty?: string;
+  phone?: string;
+}): Promise<HotelGuide> {
+  return requestJson<HotelGuide>("/api/hotel/guides", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }, { requiresAuth: true });
+}
+
+export async function updateHotelGuide(
+  id: string,
+  patch: { isAvailable?: boolean; name?: string; specialty?: string; phone?: string }
+): Promise<HotelGuide> {
+  return requestJson<HotelGuide>(`/api/hotel/guides/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  }, { requiresAuth: true });
+}
+
+export async function deleteHotelGuide(id: string): Promise<void> {
+  await requestJson<{ message: string }>(`/api/hotel/guides/${id}`, {
+    method: "DELETE",
+  }, { requiresAuth: true });
 }

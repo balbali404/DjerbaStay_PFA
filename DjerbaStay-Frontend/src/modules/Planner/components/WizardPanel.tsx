@@ -59,6 +59,7 @@ export default function WizardPanel({
 }: WizardPanelProps) {
   const progress = stepProgress(state.step);
   const hasUsageLimit = usage?.limit !== null && usage?.limit !== undefined;
+  const isUnlimitedAccess = usage?.planCode === "UNLIMITED";
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -414,17 +415,17 @@ export default function WizardPanel({
               {usage && (
                 <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3">
                   <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-primary">
-                    <span>{usage.planCode} plan usage</span>
-                    {hasUsageLimit ? (
+                    <span>{isUnlimitedAccess ? "Unlimited Access" : `${usage.planCode} plan usage`}</span>
+                    {!isUnlimitedAccess && hasUsageLimit ? (
                       <span>
                         {usage.used}/{usage.limit}
                       </span>
-                    ) : (
-                      <span>Unlimited</span>
-                    )}
+                    ) : null}
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
-                    {hasUsageLimit
+                    {isUnlimitedAccess
+                      ? "You have unlimited ML requests for generating itineraries."
+                      : hasUsageLimit
                       ? `${usage.remaining} request(s) remaining this month.`
                       : "Unlimited monthly ML requests."}
                   </p>
